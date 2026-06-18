@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head <link rel="manifest" href="manifest.json">
->
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Circle lf</title>
@@ -72,7 +71,7 @@
             transition: background-color 0.5s ease, color 0.4s ease;
         }
 
-        /* ОБНОВЛЕННЫЙ ВСТУПИТЕЛЬНЫЙ ЭКРАН (SPLASH SCREEN) */
+        /* ВСТУПИТЕЛЬНЫЙ ЭКРАН (SPLASH SCREEN) */
         .splash-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #0b0c10; display: flex; flex-direction: column;
@@ -100,7 +99,7 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { opacity: 0.6; transform: scale(0.98); } 50% { opacity: 1; transform: scale(1); } }
 
-        /* ОСТАЛЬНОЙ ИНТЕРФЕЙС */
+        /* ИНТЕРФЕЙС */
         .app-container { width: 100%; max-width: 440px; z-index: 1; position: relative; }
         .theme-switcher { width: 100%; max-width: 440px; display: flex; justify-content: flex-end; margin-bottom: 20px; }
 
@@ -115,8 +114,8 @@
             -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
         }
 
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
-        .action-btn { width: 100%; justify-content: center; font-size: 0.85rem; padding: 14px; border-radius: 16px; margin-bottom: 0; }
+        .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 24px; }
+        .action-btn { width: 100%; justify-content: center; font-size: 0.75rem; padding: 12px 6px; border-radius: 14px; margin-bottom: 0; white-space: nowrap; }
 
         .glass-panel { background: var(--panel-bg); backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px); border-radius: 28px; box-shadow: var(--shadow); padding: 24px; margin-bottom: 24px; position: relative; }
         .hero-stats { display: flex; align-items: center; gap: 24px; }
@@ -159,10 +158,10 @@
         h3 { font-weight: 400; font-size: 0.8rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px; }
 
         .input-group { display: flex; flex-direction: column; gap: 12px; }
-        input, select { padding: 14px 16px; background: var(--input-bg); border: 1px solid transparent; border-radius: 16px; font-size: 0.95rem; color: var(--text-main); transition: all 0.25s; }
-        input:focus, select:focus { border-color: rgba(255, 255, 255, 0.15); }
-        input::placeholder { color: #555; }
-        body.light-theme input::placeholder { color: #b5b5b7; }
+        input, select, textarea { padding: 14px 16px; background: var(--input-bg); border: 1px solid transparent; border-radius: 16px; font-size: 0.95rem; color: var(--text-main); transition: all 0.25s; font-family: inherit; }
+        input:focus, select:focus, textarea:focus { border-color: rgba(255, 255, 255, 0.15); }
+        input::placeholder, textarea::placeholder { color: #555; }
+        body.light-theme input::placeholder, body.light-theme textarea::placeholder { color: #b5b5b7; }
         select option { background-color: var(--bg-color); color: var(--text-main); }
 
         button.main-btn { background-color: var(--accent-color); color: var(--bg-color); border: none; padding: 15px; border-radius: 16px; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
@@ -228,11 +227,15 @@
         body.light-theme .cal-cell.has-tasks::after { background: rgba(0, 0, 0, 0.4); }
         .cal-cell.selected { background: var(--cal-active) !important; color: var(--cal-active-text) !important; font-weight: 600; }
         .cal-cell.empty { pointer-events: none; opacity: 0; }
+
+        /* СТИЛИ ДНЕВНИКА */
+        .diary-status-tag { display: inline-block; font-size: 0.65rem; background: rgba(34, 197, 94, 0.15); color: #4ade80; padding: 2px 8px; border-radius: 8px; margin-top: 4px; font-weight: 500; }
+        textarea.diary-area { width: 100%; height: 160px; resize: none; line-height: 1.5; font-size: 0.95rem; }
     </style>
 </head>
 <body>
 
-    <!-- ОБНОВЛЕННЫЙ ВСТУПИТЕЛЬНЫЙ ЭКРАН (Circle lf) -->
+    <!-- ВСТУПИТЕЛЬНЫЙ ЭКРАН -->
     <div class="splash-screen" id="splash-layer">
         <div class="splash-logo-container">
             <div class="splash-ring"></div>
@@ -325,7 +328,8 @@
 
         <!-- КНОПКИ ДЕЙСТВИЙ (СЕТКА) -->
         <div class="action-grid">
-            <button class="action-btn" onclick="openCalModal()">📅 Календарь целей</button>
+            <button class="action-btn" onclick="openCalModal()">📅 Календарь</button>
+            <button class="action-btn" onclick="openDiaryModal()">📖 Дневник мысли</button>
             <button class="action-btn" onclick="openAchModal()">🏆 Достижения</button>
         </div>
 
@@ -368,6 +372,19 @@
         </div>
     </div>
 
+    <!-- МОДАЛКА ДНЕВНИКА -->
+    <div class="modal-overlay" id="diary-modal">
+        <div class="modal-box" style="max-width: 400px; width: 90%; text-align: left;">
+            <h4 style="margin-bottom: 4px;">Дневник мыслей</h4>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;" id="diary-date-label">12 января</div>
+            <div class="input-group">
+                <textarea class="diary-area" id="diary-textarea" placeholder="Запиши свои инсайты, итоги дня или важные мысли..."></textarea>
+                <button class="main-btn" onclick="saveDiaryEntry()">Сохранить заметку</button>
+                <button class="close-ach-btn" onclick="closeDiaryModal()" style="background: transparent; color: var(--text-main); margin-top: 4px;">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="cal-modal">
         <div class="modal-box" style="max-width: 400px; width: 90%;">
             <div class="cal-header">
@@ -389,7 +406,7 @@
     </div>
 
     <script>
-        // АНИМАЦИЯ ВСТУПИТЕЛЬНОГО ЭКРАНА (1.5 секунды)
+        // ГАРАНТИРОВАННОЕ СКРЫТИЕ ЗАСТАВКИ ЧЕРЕЗ 1.5 СЕКУНДЫ
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 const splash = document.getElementById('splash-layer');
@@ -414,6 +431,9 @@
             unlockedAchs: []
         };
 
+        // Хранилище записей дневника в формате { "YYYY-MM-DD": "текст заметки" }
+        let diaryNotes = JSON.parse(localStorage.getItem('circle_lf_diary_v1')) || {};
+
         const achDatabase = [
             { id: 0, icon: "🌱", title: "Первый триумф", desc: "Успешно закройте вашу самую первую цель" },
             { id: 1, icon: "⚡", title: "Разгон набран", desc: "Выполните суммарно 5 любых задач" },
@@ -426,7 +446,7 @@
             { id: 8, icon: "🤝", title: "Баланс стихий", desc: "Поднимите абсолютно все 4 сферы до 2 уровня" },
             { id: 9, icon: "👑", title: "Укрепление ядра", desc: "Прокачайте общий ранг аккаунта до 5 уровня" },
             { id: 10, icon: "🔮", title: "Высший разум", desc: "Прокачайте общий ранг аккаунта до 10 уровня" },
-            { id: 11, icon: "🎨", title: "Свой путь", desc: "Переименовайте любую стандартную сферу прокачки" }
+            { id: 11, icon: "🎨", title: "Свой путь", desc: "Переименуйте любую стандартную сферу прокачки" }
         ];
 
         let currentTheme = localStorage.getItem('rpg_graphite_theme_mode_v4') || 'dark';
@@ -453,6 +473,7 @@
         function saveGame() {
             localStorage.setItem('rpg_glass_v2.0_state', JSON.stringify(state));
             localStorage.setItem('rpg_glass_v2.0_quests', JSON.stringify(quests));
+            localStorage.setItem('circle_lf_diary_v1', JSON.stringify(diaryNotes));
         }
 
         function saveSphereNames() {
@@ -472,7 +493,8 @@
 
         function updateDropdowns() {
             for(let i=0; i<4; i++) {
-                document.getElementById(`opt-${i}`).innerText = state.spheres[i].name;
+                const el = document.getElementById(`opt-${i}`);
+                if (el) el.innerText = state.spheres[i].name;
             }
         }
 
@@ -514,6 +536,7 @@
 
         function buildAchievementsUI() {
             const container = document.getElementById('ach-list-container');
+            if(!container) return;
             container.innerHTML = '';
             achDatabase.forEach(ach => {
                 const isUnlocked = state.unlockedAchs.includes(ach.id);
@@ -531,9 +554,11 @@
 
         function renderCalendar() {
             const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-            document.getElementById('cal-month-title').innerText = monthNames[currentCalMonth] + " " + currentCalYear;
+            const titleEl = document.getElementById('cal-month-title');
+            if(titleEl) titleEl.innerText = monthNames[currentCalMonth] + " " + currentCalYear;
             
             const container = document.getElementById('cal-grid-container');
+            if(!container) return;
             container.innerHTML = '';
 
             const labels = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
@@ -553,7 +578,7 @@
                 let dayStr = String(day).padStart(2, '0');
                 let cellDateStr = currentCalYear + "-" + monthStr + "-" + dayStr;
 
-                let hasTasks = quests.some(q => q.date === cellDateStr);
+                let hasTasks = quests.some(q => q.date === cellDateStr) || !!diaryNotes[cellDateStr];
                 let isSelected = selectedDateStr === cellDateStr;
 
                 container.innerHTML += `
@@ -578,13 +603,45 @@
             updateUI();
         }
 
+        /* ЛОГИКА ДНЕВНИКА */
+        function openDiaryModal() {
+            let d = new Date(selectedDateStr);
+            let formattedDate = d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+            
+            document.getElementById('diary-date-label').innerText = "Мысли за " + formattedDate;
+            document.getElementById('diary-textarea').value = diaryNotes[selectedDateStr] || "";
+            
+            document.getElementById('diary-modal').classList.add('active');
+        }
+
+        function closeDiaryModal() {
+            document.getElementById('diary-modal').classList.remove('active');
+        }
+
+        function saveDiaryEntry() {
+            const text = document.getElementById('diary-textarea').value.trim();
+            if (text) {
+                diaryNotes[selectedDateStr] = text;
+            } else {
+                delete diaryNotes[selectedDateStr];
+            }
+            saveGame();
+            closeDiaryModal();
+            updateUI();
+        }
+
         function updateUI() {
             const isLight = document.body.classList.contains('light-theme');
-            document.getElementById('theme-btn-icon').innerText = isLight ? "🌙" : "☀️";
-            document.getElementById('theme-btn-text').innerText = isLight ? "Темная тема" : "Светлая тема";
+            const themeBtnIcon = document.getElementById('theme-btn-icon');
+            const themeBtnText = document.getElementById('theme-btn-text');
+            if(themeBtnIcon) themeBtnIcon.innerText = isLight ? "🌙" : "☀️";
+            if(themeBtnText) themeBtnText.innerText = isLight ? "Темная тема" : "Светлая тема";
 
-            document.getElementById('main-level').innerText = state.mainLevel;
-            document.getElementById('main-xp-text').innerText = state.mainXp + " / " + state.mainNextLevelXp + " XP";
+            const mainLvlEl = document.getElementById('main-level');
+            const mainXpEl = document.getElementById('main-xp-text');
+            if(mainLvlEl) mainLvlEl.innerText = state.mainLevel;
+            if(mainXpEl) mainXpEl.innerText = state.mainXp + " / " + state.mainNextLevelXp + " XP";
+            
             const mainPercent = (state.mainXp / state.mainNextLevelXp) * 100;
             setCircleProgress('main-xp-circle', 52, mainPercent);
 
@@ -592,12 +649,18 @@
             if(state.mainLevel >= 5) status = "Специалист";
             if(state.mainLevel >= 10) status = "Мастер линейки";
             if(state.mainLevel >= 20) status = "Легендарный Разум";
-            document.getElementById('main-sphere-status').innerText = status;
+            
+            const statusEl = document.getElementById('main-sphere-status');
+            if(statusEl) statusEl.innerText = status;
 
             state.spheres.forEach((sphere, i) => {
-                document.getElementById(`sphere-name-${i}`).value = sphere.name;
-                document.getElementById(`sphere-lvl-${i}`).innerText = sphere.level;
-                document.getElementById(`sphere-xp-${i}`).innerText = sphere.xp + "/" + sphere.nextXp + " XP";
+                const nameInp = document.getElementById(`sphere-name-${i}`);
+                const lvlEl = document.getElementById(`sphere-lvl-${i}`);
+                const xpEl = document.getElementById(`sphere-xp-${i}`);
+                
+                if(nameInp) nameInp.value = sphere.name;
+                if(lvlEl) lvlEl.innerText = sphere.level;
+                if(xpEl) xpEl.innerText = sphere.xp + "/" + sphere.nextXp + " XP";
                 
                 const spherePercent = (sphere.xp / sphere.nextXp) * 100;
                 setCircleProgress(`sphere-circle-${i}`, 32, spherePercent);
@@ -608,14 +671,30 @@
 
             let d = new Date(selectedDateStr);
             let formattedDate = d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
-            document.getElementById('quests-header-text').innerText = "Цели на " + formattedDate;
+            const headerTxt = document.getElementById('quests-header-text');
+            if(headerTxt) headerTxt.innerText = "Цели на " + formattedDate;
 
             const list = document.getElementById('quests-list');
+            if(!list) return;
             list.innerHTML = '';
             
             let filteredQuests = quests.filter(q => q.date === selectedDateStr);
 
-            if(filteredQuests.length === 0) {
+            // Если есть запись в дневнике за этот день, выведем её превью перед задачами
+            if (diaryNotes[selectedDateStr]) {
+                list.innerHTML += `
+                    <div class="quest-item" style="border-left: 3px solid #4ade80; cursor: pointer;" onclick="openDiaryModal()">
+                        <div style="width: 100%;">
+                            <div class="quest-title" style="font-size: 0.9rem; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 320px;">
+                                "${diaryNotes[selectedDateStr]}"
+                            </div>
+                            <div class="diary-status-tag">📖 Дневник заполнен</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if(filteredQuests.length === 0 && !diaryNotes[selectedDateStr]) {
                 list.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 30px; font-size: 0.9rem; font-style: italic;">На этот день задач нет. Свободное время.</div>';
             }
 
@@ -656,7 +735,7 @@
             const input = document.getElementById('quest-input');
             const sphereId = parseInt(document.getElementById('quest-sphere').value);
             const difficulty = document.getElementById('quest-difficulty').value;
-            if (!input.value.trim()) return;
+            if (!input || !input.value.trim()) return;
 
             quests.push({ text: input.value, sphereId: sphereId, difficulty: difficulty, date: selectedDateStr });
             input.value = '';
@@ -670,7 +749,7 @@
                 if(idx !== index) p.classList.remove('active');
             });
             const popup = document.getElementById(`popup-${index}`);
-            popup.classList.toggle('active');
+            if(popup) popup.classList.toggle('active');
         }
 
         document.addEventListener('click', () => {
@@ -726,24 +805,24 @@
         }
 
         function showModal(title, desc) {
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-desc').innerText = desc;
-            document.getElementById('levelup-modal').classList.add('active');
+            const t = document.getElementById('modal-title');
+            const d = document.getElementById('modal-desc');
+            if(t) t.innerText = title;
+            if(d) d.innerText = desc;
+            const m = document.getElementById('levelup-modal');
+            if(m) m.classList.add('active');
         }
 
-        function closeModal() { document.getElementById('levelup-modal').classList.remove('active'); }
-        function openAchModal() { buildAchievementsUI(); document.getElementById('ach-modal').classList.add('active'); }
-        function closeAchModal() { document.getElementById('ach-modal').classList.remove('active'); }
-        function openCalModal() { renderCalendar(); document.getElementById('cal-modal').classList.add('active'); }
-        function closeCalModal() { document.getElementById('cal-modal').classList.remove('active'); }
+        function closeModal() { 
+            const m = document.getElementById('levelup-modal');
+            if(m) m.classList.remove('active'); 
+        }
+        function openAchModal() { buildAchievementsUI(); const m = document.getElementById('ach-modal'); if(m) m.classList.add('active'); }
+        function closeAchModal() { const m = document.getElementById('ach-modal'); if(m) m.classList.remove('active'); }
+        function openCalModal() { renderCalendar(); const m = document.getElementById('cal-modal'); if(m) m.classList.add('active'); }
+        function closeCalModal() { const m = document.getElementById('cal-modal'); if(m) m.classList.remove('active'); }
 
         updateUI();
-    <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js')
-      .then(() => console.log('Оффлайн-режим Circle lf активирован!'))
-      .catch((err) => console.log('Ошибка регистрации SW:', err));
-  }
-</script>
+    </script>
 </body>
 </html>
