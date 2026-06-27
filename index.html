@@ -103,7 +103,7 @@
             cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 500; box-shadow: var(--shadow);
             border: 1px solid transparent; position: relative; backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
         }
-        .toggle-style-btn::before, .glass-panel::before, .action-btn::before, .ach-card::before, .add-sphere-card::before {
+        .toggle-style-btn::before, .glass-panel::before, .action-btn::before, .ach-card::before, .add-sphere-trigger::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: inherit; padding: 1px;
             background: var(--border-gradient); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
@@ -128,7 +128,7 @@
         .stat-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 3px; }
         .stat-value { font-size: 1.25rem; font-weight: 400; margin-bottom: 4px; }
 
-        /* Контейнер для сетки и кнопки плюса */
+        /* Контейнер для сетки и кнопки плюсика */
         .spheres-container-wrapper { display: flex; flex-direction: column; align-items: center; width: 100%; margin-bottom: 24px; gap: 16px; }
         .spheres-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; width: 100%; }
         .sphere-card { background: var(--panel-bg); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; box-shadow: var(--shadow); }
@@ -145,16 +145,16 @@
         .sphere-name-input:focus { border-bottom: 1px solid var(--text-main); cursor: text; }
         .sphere-xp-text { font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; }
 
-        /* Минималистичная кнопка-плюс под кругами */
-        .add-sphere-card {
-            width: 54px; height: 54px; border-radius: 50%;
+        /* Минималистичный плюс */
+        .add-sphere-trigger {
+            width: 50px; height: 50px; border-radius: 50%;
             background: var(--panel-bg); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
             box-shadow: var(--shadow); display: flex; justify-content: center; align-items: center;
-            cursor: pointer; position: relative; font-size: 1.5rem; font-weight: 200; color: var(--text-muted);
+            cursor: pointer; position: relative; font-size: 1.6rem; font-weight: 200; color: var(--text-muted);
             transition: transform 0.2s, color 0.2s;
         }
-        .add-sphere-card:active { transform: scale(0.95); }
-        .add-sphere-card:hover { color: var(--text-main); }
+        .add-sphere-trigger:active { transform: scale(0.94); }
+        .add-sphere-trigger:hover { color: var(--text-main); }
 
         .credits-footer {
             text-align: center; font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
@@ -195,7 +195,6 @@
         .confirm-btn.no { background: transparent; color: var(--bg-color); }
         .quest-item.fade-out { opacity: 0; transform: scale(0.9) translateY(-10px); }
 
-        /* Повышен инкубационный z-index для модалок, чтобы перекрывать .app-container */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 99999; }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
         .modal-box { background: var(--panel-bg); color: var(--text-main); padding: 30px; border-radius: 24px; text-align: center; max-width: 350px; width: 85%; transform: scale(0.8); transition: transform 0.3s; position: relative; box-shadow: var(--shadow); }
@@ -274,7 +273,7 @@
             <div class="spheres-grid" id="spheres-container">
                 <!-- Сферы генерируются скриптом -->
             </div>
-            <div class="add-sphere-card" onclick="promptNewSphere()">+</div>
+            <div class="add-sphere-trigger" onclick="promptNewSphere()">+</div>
         </div>
 
         <!-- Кнопки доп. модулей -->
@@ -402,16 +401,18 @@
         }
 
         async function initApp() {
-            loadLocally();
-
-            // Если авторизации нет — принудительно открываем окно ввода
-            if (!telegramId || telegramId === "@test_user" || telegramId === "@z-test-user") {
-                updateUI(); 
+            // Жестко проверяем наличие авторизации в localStorage до выполнения любых подгрузок
+            if (!telegramId || telegramId.trim() === "" || telegramId === "@test_user" || telegramId === "@z-test-user") {
+                state = createDefaultState();
+                renderSpheresUI(); 
+                updateDropdowns();
+                document.getElementById('profile-tag-label').innerText = "Профиль: Ожидание входа";
                 document.getElementById('forced-login-modal').classList.add('active');
                 hideSplash();
                 return;
             }
             
+            // Если ID найден, запускаем штатную облачную или локальную загрузку
             await loadFromCloud();
         }
 
@@ -447,9 +448,12 @@
                     state = data[0].game_state || createDefaultState();
                     quests = data[0].quests_state || [];
                     diaryNotes = data[0].diary_state || {};
+                } else {
+                    loadLocally();
                 }
             } catch(e) {
                 console.warn("Аварийное переключение на локальный режим:", e.message);
+                loadLocally();
             }
             hideSplash(); updateUI();
         }
@@ -458,6 +462,7 @@
             try {
                 const savedState = localStorage.getItem('rpg_glass_v2.0_state');
                 if (savedState) state = JSON.parse(savedState);
+                else state = createDefaultState();
                 
                 const savedDiary = localStorage.getItem('circle_lf_diary_v1');
                 if (savedDiary) diaryNotes = JSON.parse(savedDiary);
@@ -634,7 +639,7 @@
             });
         }
 
-        // Минималистичное добавление через prompt
+        // Минималистичное добавление через системный prompt
         function promptNewSphere() {
             let name = prompt("Введите название нового круга опыта:");
             if (!name || name.trim() === "") return;
@@ -686,7 +691,7 @@
                     <div class="quest-item" style="border-left: 3px solid #4ade80; cursor: pointer;" onclick="openDiaryModal()">
                         <div style="width: 100%;">
                             <div class="quest-title" style="font-size: 0.9rem; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 320px;">"${escapeHtml(diaryNotes[selectedDateStr])}"</div>
-                            <div class="diary-status-tag">📖 Дневник зафиксирован</div>
+                            <div class="diary-status-tag">📖 Дневник заполнен</div>
                         </div>
                     </div>`;
             }
