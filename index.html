@@ -210,7 +210,7 @@
         .diary-status-tag { display: inline-block; font-size: 0.65rem; background: rgba(34, 197, 94, 0.15); color: #4ade80; padding: 2px 8px; border-radius: 8px; margin-top: 4px; }
         textarea.diary-area { width: 100%; height: 160px; resize: none; line-height: 1.5; font-size: 0.95rem; }
 
-        /* Фикс оверлея для неудаляемой авторизации */
+        /* Оверлей принудительного входа */
         #forced-login-modal { background: rgba(7, 8, 10, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); }
     </style>
 </head>
@@ -289,7 +289,7 @@
         </div>
 
         <div class="quests-container">
-            <h3 id="quests-header-text">Активные цели</h3>
+            <h3 id="quests-header-text">Active goals</h3>
             <div id="quests-list"></div>
         </div>
 
@@ -341,7 +341,7 @@
         <div class="modal-box">
             <h4 id="modal-title">Новый уровень!</h4>
             <p id="modal-desc">Вы успешно продвинулись вперед.</p>
-            <button onclick="closeModal()">Продолжить</button>
+            <button class="close-ach-btn" onclick="closeModal()">Продолжить</button>
         </div>
     </div>
 
@@ -384,12 +384,18 @@
         }
 
         async function initApp() {
-            // Если ID нет, жестко блокируем интерфейс системным оверлеем
+            // Проверяем кэш
+            loadLocally();
+
+            // Если авторизации нет — принудительно открываем окно ввода
             if (!telegramId || telegramId === "@test_user" || telegramId === "@z-test-user") {
+                updateUI(); // Предварительно строим интерфейс
                 document.getElementById('forced-login-modal').classList.add('active');
                 hideSplash();
                 return;
             }
+            
+            // Если авторизован — подгружаем облако (или локалку)
             await loadFromCloud();
         }
 
@@ -404,7 +410,6 @@
             localStorage.setItem('circle_lf_tg_id', telegramId);
             document.getElementById('forced-login-modal').classList.remove('active');
             
-            // Запускаем стандартную цепочку загрузки после авторизации
             loadFromCloud();
         }
 
@@ -426,22 +431,26 @@
                     state = data[0].game_state || createDefaultState();
                     quests = data[0].quests_state || [];
                     diaryNotes = data[0].diary_state || {};
-                } else {
-                    loadLocally();
                 }
             } catch(e) {
                 console.warn("Аварийное переключение на локальный режим:", e.message);
-                loadLocally();
             }
             hideSplash(); updateUI();
         }
 
         function loadLocally() {
             try {
-                state = JSON.parse(localStorage.getItem('rpg_glass_v2.0_state')) || createDefaultState();
-                diaryNotes = JSON.parse(localStorage.getItem('circle_lf_diary_v1')) || {};
-                quests = JSON.parse(localStorage.getItem('rpg_glass_v2.0_quests')) || [];
-            } catch(e) { state = createDefaultState(); }
+                const savedState = localStorage.getItem('rpg_glass_v2.0_state');
+                if (savedState) state = JSON.parse(savedState);
+                
+                const savedDiary = localStorage.getItem('circle_lf_diary_v1');
+                if (savedDiary) diaryNotes = JSON.parse(savedDiary);
+
+                const savedQuests = localStorage.getItem('rpg_glass_v2.0_quests');
+                if (savedQuests) quests = JSON.parse(savedQuests);
+            } catch(e) { 
+                state = createDefaultState(); 
+            }
         }
 
         async function saveToCloud() {
@@ -459,7 +468,7 @@
         }
 
         async function requestHardReset() {
-            let check = prompt("🚨 ВНИМАНИЕ: Это действие безвозвратно сотрет все ваши уровни, квесты и дневники на всех устройствах!\n\nДля подтверждения введите слово УДАЛИТЬ большими буквами:");
+            let check = prompt("🚨 ВНИМАНИЕ: Это действие безвозвратно сотрет все ваши уровни, квесты и дневники!\n\nДля подтверждения введите слово УДАЛИТЬ:");
             if (check === "УДАЛИТЬ") {
                 localStorage.removeItem('rpg_glass_v2.0_state');
                 localStorage.removeItem('rpg_glass_v2.0_quests');
@@ -477,8 +486,6 @@
 
                 alert("Все данные успешно стерты. Приложение перезапускается.");
                 location.reload();
-            } else {
-                alert("Сброс отменен. Кодовое слово введено неверно.");
             }
         }
 
@@ -516,7 +523,7 @@
 
         function saveSphereNames() {
             let changed = false;
-            state.spheres.forEach((sphere, i) => {
+            state.spheres.forEach((sphere) => {
                 let inputEl = document.getElementById(`sphere-name-${sphere.id}`);
                 if (inputEl) {
                     let newName = inputEl.value.trim();
@@ -537,7 +544,7 @@
             state.spheres.forEach(sphere => {
                 select.innerHTML += `<option value="${sphere.id}">${sphere.name}</option>`;
             });
-            if (currentVal !== "") select.value = currentVal;
+            if (currentVal !== "" && [...select.options].some(o => o.value === currentVal)) select.value = currentVal;
         }
 
         function setCircleProgress(elementId, radius, percent) { const circle = document.getElementById(elementId); if (!circle) return; const circumference = 2 * Math.PI * radius; circle.style.strokeDasharray = circumference + ' ' + circumference; circle.style.strokeDashoffset = circumference - (percent / 100 * circumference); }
@@ -574,8 +581,8 @@
             if (state.hardCompleted >= 3) triggerAchievement(4);
             if (state.hardCompleted >= 10) triggerAchievement(5);
             let lvls = state.spheres.map(s => s.level);
-            if (Math.max(...lvls) >= 3) triggerAchievement(6);
-            if (Math.max(...lvls) >= 5) triggerAchievement(7);
+            if (lvls.length > 0 && Math.max(...lvls) >= 3) triggerAchievement(6);
+            if (lvls.length > 0 && Math.max(...lvls) >= 5) triggerAchievement(7);
             if (lvls.length >= 4 && Math.min(...lvls) >= 2) triggerAchievement(8);
             if (state.mainLevel >= 5) triggerAchievement(9);
             if (state.mainLevel >= 10) triggerAchievement(10);
@@ -589,7 +596,6 @@
             });
         }
 
-        // Динамический рендер сфер в грид-сетку
         function renderSpheresUI() {
             const container = document.getElementById('spheres-container');
             if (!container) return;
@@ -612,13 +618,11 @@
             });
         }
 
-        // Логика динамического добавления новой сферы
         function addNewSphere() {
             const input = document.getElementById('new-sphere-input');
             const name = input.value.trim();
             if (!name) return;
 
-            // Генерируем уникальный ID на базе таймстампа
             const newId = Date.now();
             state.spheres.push({
                 id: newId,
@@ -647,10 +651,8 @@
             if(state.mainLevel >= 10) status = "Мастер линейки";
             document.getElementById('main-sphere-status').innerText = status;
 
-            // Перерисовываем элементы интерфейса сфер
             renderSpheresUI();
             
-            // Настраиваем прогресс-бары для каждой сферы
             state.spheres.forEach(sphere => {
                 setCircleProgress(`sphere-circle-${sphere.id}`, 32, (sphere.xp / sphere.nextXp) * 100);
             });
@@ -669,7 +671,7 @@
                     <div class="quest-item" style="border-left: 3px solid #4ade80; cursor: pointer;" onclick="openDiaryModal()">
                         <div style="width: 100%;">
                             <div class="quest-title" style="font-size: 0.9rem; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 320px;">"${escapeHtml(diaryNotes[selectedDateStr])}"</div>
-                            <div class="diary-status-tag">📖 Дневник закроется</div>
+                            <div class="diary-status-tag">📖 Дневник заполнен</div>
                         </div>
                     </div>`;
             }
@@ -728,7 +730,9 @@
 
         function addQuest() {
             const input = document.getElementById('quest-input');
-            const sphereId = parseInt(document.getElementById('quest-sphere').value);
+            const selectEl = document.getElementById('quest-sphere');
+            if (!selectEl || selectEl.value === "") return;
+            const sphereId = parseInt(selectEl.value);
             const difficulty = document.getElementById('quest-difficulty').value;
             if (!input || !input.value.trim()) return;
 
