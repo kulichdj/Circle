@@ -13,34 +13,19 @@
             --accent-color: #af52de;
             --glass-border: rgba(255, 255, 255, 0.08);
             --glass-blur: blur(20px);
-            
-            /* Дефолтные цвета сфер */
-            --color-job: #8e44ad;
-            --color-hobby: #27ae60;
-            --color-relax: #2980b9;
-            --color-sport: #c0392b;
-        }
-
-        .light-theme {
-            --bg-color: #f2f2f7;
-            --panel-bg: rgba(255, 255, 255, 0.75);
-            --text-color: #000000;
-            --text-muted: #6c6c72;
-            --glass-border: rgba(0, 0, 0, 0.08);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            transition: background-color 0.3s, color 0.3s;
             display: flex;
             justify-content: center;
             align-items: flex-start;
@@ -57,77 +42,7 @@
             gap: 16px;
         }
 
-        /* Хедер и Управление темами/персонализацией */
-        .header-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 4px;
-        }
-
-        .btn-icon {
-            background: var(--panel-bg);
-            border: 1px solid var(--glass-border);
-            backdrop-filter: var(--glass-blur);
-            color: var(--text-color);
-            padding: 10px 14px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: opacity 0.2s;
-        }
-
-        .btn-icon:active {
-            opacity: 0.7;
-        }
-
-        /* Окна авторизации и персонализации */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0; pointer-events: none;
-            transition: opacity 0.3s;
-        }
-
-        .modal-overlay.active {
-            opacity: 1; pointer-events: auto;
-        }
-
-        .modal-content {
-            background: var(--panel-bg);
-            border: 1px solid var(--glass-border);
-            backdrop-filter: var(--glass-blur);
-            padding: 24px;
-            border-radius: 24px;
-            width: 90%;
-            max-width: 360px;
-            text-align: center;
-            color: var(--text-color);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        }
-
-        .modal-content h3 { margin-bottom: 16px; font-weight: 600; }
-
-        .input-field {
-            width: 100%;
-            padding: 12px;
-            border-radius: 12px;
-            border: 1px solid var(--glass-border);
-            background: rgba(0, 0, 0, 0.2);
-            color: var(--text-color);
-            font-size: 16px;
-            margin-bottom: 16px;
-            outline: none;
-        }
-
-        /* Стили стеклянных панелей */
+        /* Панели */
         .glass-panel {
             background: var(--panel-bg);
             border: 1px solid var(--glass-border);
@@ -188,7 +103,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            position: relative;
+            cursor: pointer;
         }
 
         .category-card .circle-progress-wrapper { width: 44px; height: 44px; }
@@ -198,75 +113,81 @@
         .cat-det h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
         .cat-det p { font-size: 11px; color: var(--text-muted); }
 
-        /* Кастомный селектор цветов в настройках */
-        .color-picker-group {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
-            margin-bottom: 16px;
-        }
-
-        .color-dot {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: transform 0.2s;
-        }
-
-        .color-dot.active { border-color: var(--text-color); transform: scale(1.1); }
-
-        /* Секция квестов */
-        .section-title { font-size: 14px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-
-        .quest-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 14px;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid var(--glass-border);
-            border-radius: 14px;
-            margin-top: 8px;
-        }
-
-        .quest-left { display: flex; flex-direction: column; gap: 2px; }
-        .quest-title { font-size: 14px; font-weight: 500; }
-        .quest-reward { font-size: 11px; color: var(--accent-color); font-weight: bold; }
-
-        .btn-complete {
+        /* Кнопки и инпуты */
+        .btn-action {
             background: var(--accent-color);
             border: none;
             color: #fff;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 12px;
+            padding: 12px;
+            border-radius: 14px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
+            width: 100%;
+            transition: opacity 0.2s;
         }
 
-        .danger-zone {
-            margin-top: 10px;
+        .btn-action:active { opacity: 0.8; }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--text-color);
+            font-size: 16px;
+            outline: none;
+        }
+
+        .select-field {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--text-color);
+            font-size: 14px;
+            outline: none;
+            margin-bottom: 10px;
+        }
+
+        /* Модалка авторизации */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(15px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+        .modal-content {
+            background: var(--panel-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: var(--glass-blur);
+            padding: 24px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 360px;
             text-align: center;
         }
 
-        .btn-danger {
-            background: none; border: none; color: #ff453a; font-size: 12px; cursor: pointer; opacity: 0.6;
-        }
-        .btn-danger:hover { opacity: 1; }
+        .modal-content h3 { margin-bottom: 12px; font-size: 20px; }
+        .modal-content p { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
     <div class="app-container">
         
-        <div class="header-controls">
-            <button class="btn-icon" onclick="openPersonalization()">🎨 Стили</button>
-            <button class="btn-icon" id="themeToggle" onclick="toggleTheme()">🌙 Темная</button>
-        </div>
-
+        <!-- Профиль -->
         <div class="glass-panel">
             <div class="profile-section">
                 <div class="circle-progress-wrapper">
@@ -274,149 +195,69 @@
                         <circle class="circle-bg" cx="35" cy="35" r="31"></circle>
                         <circle class="circle-fill" id="coreCircle" cx="35" cy="35" r="31" stroke="#af52de" stroke-dasharray="194.7" stroke-dashoffset="194.7"></circle>
                     </svg>
-                    <div class="circle-inner-text" id="coreLevel">0</div>
+                    <div class="circle-inner-text" id="coreLevel">1</div>
                 </div>
                 <div class="profile-info">
                     <h2 id="userNameDisplay">@user</h2>
-                    <p id="coreXpText">Прогресс Ядра: 0 / 100 XP</p>
+                    <p id="coreXpText">Уровень ядра: 0 / 100 XP</p>
                 </div>
             </div>
         </div>
 
-        <div class="grid-categories">
-            
-            <div class="category-card" onclick="openSphereConfig('job')">
-                <div class="circle-progress-wrapper">
-                    <svg class="circle-svg">
-                        <circle class="circle-bg" cx="22" cy="22" r="19"></circle>
-                        <circle class="circle-fill" id="fill-job" cx="22" cy="22" r="19" stroke-dasharray="119.3" stroke-dashoffset="119.3"></circle>
-                    </svg>
-                    <div class="circle-inner-text" id="lvl-job">0</div>
-                </div>
-                <div class="cat-det">
-                    <h4>Работа</h4>
-                    <p id="xp-job">0 XP</p>
-                </div>
-            </div>
-
-            <div class="category-card" onclick="openSphereConfig('hobby')">
-                <div class="circle-progress-wrapper">
-                    <svg class="circle-svg">
-                        <circle class="circle-bg" cx="22" cy="22" r="19"></circle>
-                        <circle class="circle-fill" id="fill-hobby" cx="22" cy="22" r="19" stroke-dasharray="119.3" stroke-dashoffset="119.3"></circle>
-                    </svg>
-                    <div class="circle-inner-text" id="lvl-hobby">0</div>
-                </div>
-                <div class="cat-det">
-                    <h4>Хобби</h4>
-                    <p id="xp-hobby">0 XP</p>
-                </div>
-            </div>
-
-            <div class="category-card" onclick="openSphereConfig('relax')">
-                <div class="circle-progress-wrapper">
-                    <svg class="circle-svg">
-                        <circle class="circle-bg" cx="22" cy="22" r="19"></circle>
-                        <circle class="circle-fill" id="fill-relax" cx="22" cy="22" r="19" stroke-dasharray="119.3" stroke-dashoffset="119.3"></circle>
-                    </svg>
-                    <div class="circle-inner-text" id="lvl-relax">0</div>
-                </div>
-                <div class="cat-det">
-                    <h4>Отдых</h4>
-                    <p id="xp-relax">0 XP</p>
-                </div>
-            </div>
-
-            <div class="category-card" onclick="openSphereConfig('sport')">
-                <div class="circle-progress-wrapper">
-                    <svg class="circle-svg">
-                        <circle class="circle-bg" cx="22" cy="22" r="19"></circle>
-                        <circle class="circle-fill" id="fill-sport" cx="22" cy="22" r="19" stroke-dasharray="119.3" stroke-dashoffset="119.3"></circle>
-                    </svg>
-                    <div class="circle-inner-text" id="lvl-sport">0</div>
-                </div>
-                <div class="cat-det">
-                    <h4>Спорт</h4>
-                    <p id="xp-sport">0 XP</p>
-                </div>
-            </div>
-
+        <!-- Сетка сфер прокачки -->
+        <div class="grid-categories" id="categoriesGrid">
+            <!-- Сферы генерируются динамически через JS -->
         </div>
 
+        <!-- Панель добавления новых сфер -->
         <div class="glass-panel">
-            <div class="section-title">Генератор Квестов из Мыслей</div>
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 4px;">Запиши инсайт или идею, выбери сферу, и приложение сгенерирует квест на внедрение!</p>
-            
-            <input type="text" id="thoughtInput" class="input-field" placeholder="Например: Идея для нового рилса..." style="margin-bottom: 10px;">
-            
-            <select id="thoughtSphere" class="input-field" style="margin-bottom: 12px; background: rgba(0,0,0,0.4);">
-                <option value="job">Работа</option>
-                <option value="hobby">Хобби</option>
-                <option value="relax">Отдых</option>
-                <option value="sport">Спорт</option>
+            <h4 style="font-size: 14px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Создать новую сферу</h4>
+            <input type="text" id="newSphereName" class="input-field" placeholder="Название (например, Спорт, Финансы)" style="margin-bottom: 10px;">
+            <select id="newSphereColor" class="select-field">
+                <option value="#8e44ad">Фиолетовый</option>
+                <option value="#27ae60">Зеленый</option>
+                <option value="#2980b9">Синий</option>
+                <option value="#c0392b">Красный</option>
+                <option value="#e67e22">Оранжевый</option>
+                <option value="#f1c40f">Желтый</option>
             </select>
-            
-            <button class="btn-icon" style="width:100%; background: var(--accent-color); border:none;" onclick="generateQuestFromThought()">Создать активный квест</button>
-
-            <div id="activeQuestsContainer" style="margin-top: 8px;">
-                </div>
-        </div>
-
-        <div class="danger-zone">
-            <button class="btn-danger" onclick="secureReset()">Сбросить все данные приложения</button>
+            <button class="btn-action" onclick="addNewSphere()">Добавить сферу</button>
         </div>
 
     </div>
 
+    <!-- МОДАЛКА ОБЯЗАТЕЛЬНОЙ АВТОРИЗАЦИИ -->
     <div class="modal-overlay" id="loginModal">
         <div class="modal-content">
-            <h3>Вход в Circle LF</h3>
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Для синхронизации данных, пожалуйста, укажите свои данные.</p>
-            <input type="text" id="usernameInput" class="input-field" placeholder="Введите свой логин">
-            <button class="btn-icon" style="width: 100%; background: var(--accent-color); border:none;" onclick="saveLogin()">Войти в систему</button>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="personalizationModal" onclick="closeModalOnOuterClick(event, 'personalizationModal')">
-        <div class="modal-content">
-            <h3 id="colorModalTitle">Цвет колец опыта</h3>
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;" id="colorModalDesc">Выберите индивидуальный оттенок для ваших уровней:</p>
-            
-            <div class="color-picker-group">
-                <div class="color-dot" style="background: #8e44ad;" onclick="selectColorHex('#8e44ad')"></div>
-                <div class="color-dot" style="background: #27ae60;" onclick="selectColorHex('#27ae60')"></div>
-                <div class="color-dot" style="background: #2980b9;" onclick="selectColorHex('#2980b9')"></div>
-                <div class="color-dot" style="background: #c0392b;" onclick="selectColorHex('#c0392b')"></div>
-                <div class="color-dot" style="background: #e67e22;" onclick="selectColorHex('#e67e22')"></div>
-                <div class="color-dot" style="background: #00d2d3;" onclick="selectColorHex('#00d2d3')"></div>
-            </div>
-
-            <button class="btn-icon" style="width: 100%;" onclick="closePersonalization()">Применить стиль</button>
+            <h3>Вход в систему</h3>
+            <p>Введите ваш уникальный логин для кастомизации игрового профиля.</p>
+            <input type="text" id="usernameInput" class="input-field" placeholder="Введите свой логин" style="margin-bottom: 16px;">
+            <button class="btn-action" onclick="saveLogin()">Запустить приложение</button>
         </div>
     </div>
 
     <script>
-        // Инициализация базы данных состояний
+        // Базовый стейт с дефолтными сферами, как было раньше
         let state = {
             user: "z-test-user",
             isAuthorized: false,
-            theme: "dark",
-            colors: { job: "#8e44ad", hobby: "#27ae60", relax: "#2980b9", sport: "#c0392b" },
-            levels: { core: 1, job: 0, hobby: 0, relax: 0, sport: 0 },
-            xp: { core: 0, job: 0, hobby: 0, relax: 0, sport: 0 },
-            quests: []
+            levels: { core: 1 },
+            xp: { core: 0 },
+            spheres: [
+                { id: "job", name: "Работа", color: "#8e44ad", level: 0, xp: 0 },
+                { id: "hobby", name: "Хобби", color: "#27ae60", level: 0, xp: 0 },
+                { id: "relax", name: "Отдых", color: "#2980b9", level: 0, xp: 0 },
+                { id: "sport", name: "Спорт", color: "#c0392b", level: 0, xp: 0 }
+            ]
         };
 
-        let activeConfigSphere = 'job';
-
-        // Загрузка данных из кэша браузера
         window.onload = function() {
-            const savedState = localStorage.getItem('circle_lf_state');
-            if (savedState) {
-                state = JSON.parse(savedState);
+            const savedData = localStorage.getItem('circle_lf_base_state');
+            if (savedData) {
+                state = JSON.parse(savedData);
             }
-            
-            // Если не авторизован — жестко выводим модалку
+
+            // Жесткая проверка авторизации
             if (!state.isAuthorized || state.user === "z-test-user") {
                 document.getElementById('loginModal').classList.add('active');
             } else {
@@ -425,196 +266,109 @@
         };
 
         function saveState() {
-            localStorage.setItem('circle_lf_state', JSON.stringify(state));
+            localStorage.setItem('circle_lf_base_state', JSON.stringify(state));
         }
 
-        // Авторизация
         function saveLogin() {
-            const input = document.getElementById('usernameInput').value.trim();
-            if(!input) {
-                alert("Поле логина не может быть пустым!");
+            const loginInput = document.getElementById('usernameInput').value.trim();
+            if (!loginInput) {
+                alert("Пожалуйста, введите логин!");
                 return;
             }
-            state.user = input.startsWith('@') ? input : '@' + input;
+            state.user = loginInput.startsWith('@') ? loginInput : '@' + loginInput;
             state.isAuthorized = true;
             saveState();
             document.getElementById('loginModal').classList.remove('active');
             updateUI();
         }
 
-        // Переключение тем интерфейса
-        function toggleTheme() {
-            const body = document.body;
-            const btn = document.getElementById('themeToggle');
-            if(body.classList.contains('light-theme')) {
-                body.classList.remove('light-theme');
-                btn.innerText = "🌙 Темная";
-                state.theme = "dark";
-            } else {
-                body.classList.add('light-theme');
-                btn.innerText = "☀️ Светлая";
-                state.theme = "light";
+        // Клик по сфере симулирует начисление опыта (как в старой версии)
+        function gainXp(sphereId) {
+            const sphere = state.spheres.find(s => s.id === sphereId);
+            if (!sphere) return;
+
+            sphere.xp += 25;
+            state.xp.core += 10; // Опыт в ядро
+
+            // Левелап сферы
+            if (sphere.xp >= 100) {
+                sphere.level += 1;
+                sphere.xp = 0;
             }
-            saveState();
-        }
 
-        // Управление персонализацией цветов
-        function openPersonalization() {
-            activeConfigSphere = 'all';
-            document.getElementById('colorModalTitle').innerText = "Глобальный акцент";
-            document.getElementById('colorModalDesc').innerText = "Выберите основной цвет темы приложения:";
-            document.getElementById('personalizationModal').classList.add('active');
-        }
-
-        function openSphereConfig(sphereKey) {
-            activeConfigSphere = sphereKey;
-            const names = {job:'Работа', hobby:'Хобби', relax:'Отдых', sport:'Спорт'};
-            document.getElementById('colorModalTitle').innerText = `Сфера: ${names[sphereKey]}`;
-            document.getElementById('colorModalDesc').innerText = "Настройте уникальный цвет кольца опыта:";
-            document.getElementById('personalizationModal').classList.add('active');
-        }
-
-        function selectColorHex(hex) {
-            if(activeConfigSphere === 'all') {
-                document.documentElement.style.setProperty('--accent-color', hex);
-                state.colors.global = hex;
-            } else {
-                state.colors[activeConfigSphere] = hex;
-                document.getElementById(`fill-${activeConfigSphere}`).style.stroke = hex;
+            // Левелап ядра
+            if (state.xp.core >= 100) {
+                state.levels.core += 1;
+                state.xp.core = 0;
             }
-            
-            // Визуальный апдейт активной точки
-            const dots = document.querySelectorAll('.color-dot');
-            dots.forEach(d => {
-                if(d.style.backgroundColor === hex || d.getAttribute('style').includes(hex)) {
-                    d.classList.add('active');
-                } else {
-                    d.classList.remove('active');
-                }
-            });
-            
+
             saveState();
             updateUI();
         }
 
-        function closePersonalization() {
-            document.getElementById('personalizationModal').classList.remove('active');
-        }
+        // Функция динамического добавления новых кругов
+        function addNewSphere() {
+            const nameInput = document.getElementById('newSphereName');
+            const name = nameInput.value.trim();
+            const color = document.getElementById('newSphereColor').value;
 
-        function closeModalOnOuterClick(e, id) {
-            if(e.target.id === id) {
-                document.getElementById(id).classList.remove('active');
-            }
-        }
-
-        // Механика квестов на базе идей пользователя
-        function generateQuestFromThought() {
-            const input = document.getElementById('thoughtInput');
-            const text = input.value.trim();
-            const sphere = document.getElementById('thoughtSphere').value;
-            
-            if(!text) return;
-
-            const newQuest = {
-                id: Date.now(),
-                title: `Внедрить: "${text}"`,
-                sphere: sphere
-            };
-
-            state.quests.push(newQuest);
-            input.value = "";
-            saveState();
-            renderQuests();
-        }
-
-        function completeQuest(id, sphere) {
-            state.quests = state.quests.filter(q => q.id !== id);
-            
-            // Начисление опыта за выполнение квеста
-            addXp(sphere, 50);
-            addXp('core', 25);
-            
-            saveState();
-            renderQuests();
-            updateUI();
-        }
-
-        function addXp(sphere, amount) {
-            state.xp[sphere] += amount;
-            if(state.xp[sphere] >= 100) {
-                state.levels[sphere] += Math.floor(state.xp[sphere] / 100);
-                state.xp[sphere] = state.xp[sphere] % 100;
-            }
-        }
-
-        function renderQuests() {
-            const container = document.getElementById('activeQuestsContainer');
-            container.innerHTML = "";
-            
-            if(state.quests.length === 0) {
-                container.innerHTML = `<p style="font-size:12px; color:var(--text-muted); text-align:center; padding:10px;">Активных игровых испытаний пока нет.</p>`;
+            if (!name) {
+                alert("Введите название сферы!");
                 return;
             }
 
-            state.quests.forEach(q => {
-                const names = {job:'Работа', hobby:'Хобби', relax:'Отдых', sport:'Спорт'};
-                const div = document.createElement('div');
-                div.className = "quest-item";
-                div.innerHTML = `
-                    <div class="quest-left">
-                        <span class="quest-title">${q.title}</span>
-                        <span class="quest-reward">[${names[q.sphere]}] +50 XP</span>
+            const id = 'sphere_' + Date.now();
+            state.spheres.push({
+                id: id,
+                name: name,
+                color: color,
+                level: 0,
+                xp: 0
+            });
+
+            nameInput.value = "";
+            saveState();
+            updateUI();
+        }
+
+        // Рендер сфер в сетку
+        function renderSpheres() {
+            const grid = document.getElementById('categoriesGrid');
+            grid.innerHTML = "";
+
+            state.spheres.forEach(s => {
+                const offset = 119.3 - (119.3 * s.xp / 100);
+                
+                const card = document.createElement('div');
+                card.className = "category-card";
+                card.onclick = () => gainXp(s.id);
+                card.innerHTML = `
+                    <div class="circle-progress-wrapper">
+                        <svg class="circle-svg">
+                            <circle class="circle-bg" cx="22" cy="22" r="19"></circle>
+                            <circle class="circle-fill" cx="22" cy="22" r="19" stroke="${s.color}" stroke-dasharray="119.3" stroke-dashoffset="${offset}"></circle>
+                        </svg>
+                        <div class="circle-inner-text">${s.level}</div>
                     </div>
-                    <button class="btn-complete" onclick="completeQuest(${q.id}, '${q.sphere}')">Выполнить</button>
+                    <div class="cat-det">
+                        <h4>${s.name}</h4>
+                        <p>${s.xp} / 100 XP</p>
+                    </div>
                 `;
-                container.appendChild(div);
+                grid.appendChild(card);
             });
         }
 
-        // Обновление всего UI на основе стейта данных
+        // Синхронизация данных с интерфейсом
         function updateUI() {
             document.getElementById('userNameDisplay').innerText = state.user;
-            
-            // Обновление ядра
             document.getElementById('coreLevel').innerText = state.levels.core;
-            document.getElementById('coreXpText').innerText = `Прогресс Ядра: ${state.xp.core} / 100 XP`;
-            
+            document.getElementById('coreXpText').innerText = `Уровень ядра: ${state.xp.core} / 100 XP`;
+
             const coreOffset = 194.7 - (194.7 * state.xp.core / 100);
             document.getElementById('coreCircle').style.strokeDashoffset = coreOffset;
 
-            // Обновление 4 основных сфер
-            const spheres = ['job', 'hobby', 'relax', 'sport'];
-            spheres.forEach(s => {
-                document.getElementById(`lvl-${s}`).innerText = state.levels[s];
-                document.getElementById(`xp-${s}`).innerText = `${state.xp[s]} / 100 XP`;
-                
-                const fillElement = document.getElementById(`fill-${s}`);
-                const offset = 119.3 - (119.3 * state.xp[s] / 100);
-                fillElement.style.strokeDashoffset = offset;
-                
-                if(state.colors[s]) {
-                    fillElement.style.stroke = state.colors[s];
-                }
-            });
-
-            if(state.colors.global) {
-                document.documentElement.style.setProperty('--accent-color', state.colors.global);
-            }
-
-            // Рендер квестов
-            renderQuests();
-        }
-
-        // Безопасное удаление базы данных с подтверждением
-        function secureReset() {
-            const check = prompt("Для удаления всех данных приложения введите кодовое слово: СБРОС");
-            if(check === "СБРОС" || check === "сброс") {
-                localStorage.removeItem('circle_lf_state');
-                alert("Все данные успешно стерты. Приложение будет перезапущено.");
-                window.location.reload();
-            } else {
-                alert("Неверный код безопасности.");
-            }
+            renderSpheres();
         }
     </script>
 </body>
