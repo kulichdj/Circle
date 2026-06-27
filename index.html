@@ -95,7 +95,7 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { opacity: 0.6; transform: scale(0.98); } 50% { opacity: 1; transform: scale(1); } }
 
-        .app-container { width: 100%; max-width: 440px; z-index: 1; position: relative; }
+        .app-container { width: 100%; max-width: 440px; z-index: 10; position: relative; }
         .theme-switcher { width: 100%; max-width: 440px; display: flex; justify-content: flex-end; margin-bottom: 20px; }
 
         .toggle-style-btn, .action-btn {
@@ -103,7 +103,7 @@
             cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 500; box-shadow: var(--shadow);
             border: 1px solid transparent; position: relative; backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
         }
-        .toggle-style-btn::before, .glass-panel::before, .action-btn::before, .ach-card::before {
+        .toggle-style-btn::before, .glass-panel::before, .action-btn::before, .ach-card::before, .add-sphere-card::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: inherit; padding: 1px;
             background: var(--border-gradient); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
@@ -128,7 +128,9 @@
         .stat-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 3px; }
         .stat-value { font-size: 1.25rem; font-weight: 400; margin-bottom: 4px; }
 
-        .spheres-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        /* Контейнер для сетки и кнопки плюса */
+        .spheres-container-wrapper { display: flex; flex-direction: column; align-items: center; width: 100%; margin-bottom: 24px; gap: 16px; }
+        .spheres-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; width: 100%; }
         .sphere-card { background: var(--panel-bg); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; box-shadow: var(--shadow); }
         .sphere-card::before { content: ''; position: absolute; top:0; left:0; right:0; bottom:0; border-radius: inherit; padding: 1px; background: var(--border-gradient); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
         .sphere-circle-container { position: relative; width: 70px; height: 70px; display: flex; justify-content: center; align-items: center; margin-bottom: 8px; }
@@ -142,6 +144,17 @@
         .sphere-name-input { background: transparent; border: none; color: var(--text-main); font-size: 0.85rem; text-align: center; width: 100%; font-weight: 400; letter-spacing: 0.3px; padding: 2px; border-bottom: 1px solid transparent; cursor: pointer; transition: color 0.3s; }
         .sphere-name-input:focus { border-bottom: 1px solid var(--text-main); cursor: text; }
         .sphere-xp-text { font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; }
+
+        /* Минималистичная кнопка-плюс под кругами */
+        .add-sphere-card {
+            width: 54px; height: 54px; border-radius: 50%;
+            background: var(--panel-bg); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            box-shadow: var(--shadow); display: flex; justify-content: center; align-items: center;
+            cursor: pointer; position: relative; font-size: 1.5rem; font-weight: 200; color: var(--text-muted);
+            transition: transform 0.2s, color 0.2s;
+        }
+        .add-sphere-card:active { transform: scale(0.95); }
+        .add-sphere-card:hover { color: var(--text-main); }
 
         .credits-footer {
             text-align: center; font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
@@ -182,7 +195,8 @@
         .confirm-btn.no { background: transparent; color: var(--bg-color); }
         .quest-item.fade-out { opacity: 0; transform: scale(0.9) translateY(-10px); }
 
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 100; }
+        /* Повышен инкубационный z-index для модалок, чтобы перекрывать .app-container */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 99999; }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
         .modal-box { background: var(--panel-bg); color: var(--text-main); padding: 30px; border-radius: 24px; text-align: center; max-width: 350px; width: 85%; transform: scale(0.8); transition: transform 0.3s; position: relative; box-shadow: var(--shadow); }
         .modal-overlay.active .modal-box { transform: scale(1); }
@@ -210,8 +224,7 @@
         .diary-status-tag { display: inline-block; font-size: 0.65rem; background: rgba(34, 197, 94, 0.15); color: #4ade80; padding: 2px 8px; border-radius: 8px; margin-top: 4px; }
         textarea.diary-area { width: 100%; height: 160px; resize: none; line-height: 1.5; font-size: 0.95rem; }
 
-        /* Оверлей принудительного входа */
-        #forced-login-modal { background: rgba(7, 8, 10, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); }
+        #forced-login-modal { background: rgba(7, 8, 10, 0.93); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); }
     </style>
 </head>
 <body>
@@ -256,29 +269,29 @@
             </div>
         </div>
 
-        <div class="spheres-grid" id="spheres-container">
+        <!-- Контейнер для сфер и минималистичного плюса -->
+        <div class="spheres-container-wrapper">
+            <div class="spheres-grid" id="spheres-container">
+                <!-- Сферы генерируются скриптом -->
             </div>
+            <div class="add-sphere-card" onclick="promptNewSphere()">+</div>
+        </div>
 
+        <!-- Кнопки доп. модулей -->
         <div class="action-grid">
             <button class="action-btn" onclick="openCalModal()">📅 Календарь</button>
             <button class="action-btn" onclick="openDiaryModal()">📖 Дневник мысли</button>
             <button class="action-btn" onclick="openAchModal()">🏆 Достижения</button>
         </div>
 
-        <div class="glass-panel">
-            <h2>Новый круг опыта</h2>
-            <div class="input-group">
-                <input type="text" id="new-sphere-input" placeholder="Название сферы (например, Финансы)">
-                <button class="main-btn" onclick="addNewSphere()">Создать сферу</button>
-            </div>
-        </div>
-
+        <!-- Модуль создания целей -->
         <div class="glass-panel">
             <h2 id="form-title">Новая цель</h2>
             <div class="input-group">
                 <input type="text" id="quest-input" placeholder="What needs to be done?">
                 <select id="quest-sphere">
-                    </select>
+                    <!-- Опции выпадают динамически -->
+                </select>
                 <select id="quest-difficulty">
                     <option value="easy">Малый фокус (+20 XP)</option>
                     <option value="medium" selected>Стандартная цель (+50 XP)</option>
@@ -305,6 +318,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛКА ДОСТИЖЕНИЙ -->
     <div class="modal-overlay" id="ach-modal">
         <div class="modal-box ach-box">
             <h4>Свиток достижений</h4>
@@ -313,6 +327,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛКА ДНЕВНИКА -->
     <div class="modal-overlay" id="diary-modal">
         <div class="modal-box" style="max-width: 400px; width: 90%; text-align: left;">
             <h4>Дневник мыслей</h4>
@@ -325,6 +340,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛКА КАЛЕНДАРЯ -->
     <div class="modal-overlay" id="cal-modal">
         <div class="modal-box" style="max-width: 400px; width: 90%;">
             <div class="cal-header">
@@ -337,6 +353,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛКА ЛЕВЕЛАПА -->
     <div class="modal-overlay" id="levelup-modal">
         <div class="modal-box">
             <h4 id="modal-title">Новый уровень!</h4>
@@ -345,6 +362,7 @@
         </div>
     </div>
 
+    <!-- НЕУДАЛЯЕМАЯ МОДАЛКА ОБЯЗАТЕЛЬНОЙ АВТОРИЗАЦИИ -->
     <div class="modal-overlay" id="forced-login-modal">
         <div class="modal-box" style="max-width: 360px;">
             <h4 style="margin-bottom: 8px;">Вход в Circle lf</h4>
@@ -384,18 +402,16 @@
         }
 
         async function initApp() {
-            // Проверяем кэш
             loadLocally();
 
             // Если авторизации нет — принудительно открываем окно ввода
             if (!telegramId || telegramId === "@test_user" || telegramId === "@z-test-user") {
-                updateUI(); // Предварительно строим интерфейс
+                updateUI(); 
                 document.getElementById('forced-login-modal').classList.add('active');
                 hideSplash();
                 return;
             }
             
-            // Если авторизован — подгружаем облако (или локалку)
             await loadFromCloud();
         }
 
@@ -618,21 +634,20 @@
             });
         }
 
-        function addNewSphere() {
-            const input = document.getElementById('new-sphere-input');
-            const name = input.value.trim();
-            if (!name) return;
+        // Минималистичное добавление через prompt
+        function promptNewSphere() {
+            let name = prompt("Введите название нового круга опыта:");
+            if (!name || name.trim() === "") return;
 
             const newId = Date.now();
             state.spheres.push({
                 id: newId,
-                name: name,
+                name: name.trim(),
                 level: 0,
                 xp: 0,
                 nextXp: 100
             });
 
-            input.value = '';
             saveToCloud();
             updateUI();
         }
@@ -671,7 +686,7 @@
                     <div class="quest-item" style="border-left: 3px solid #4ade80; cursor: pointer;" onclick="openDiaryModal()">
                         <div style="width: 100%;">
                             <div class="quest-title" style="font-size: 0.9rem; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 320px;">"${escapeHtml(diaryNotes[selectedDateStr])}"</div>
-                            <div class="diary-status-tag">📖 Дневник заполнен</div>
+                            <div class="diary-status-tag">📖 Дневник зафиксирован</div>
                         </div>
                     </div>`;
             }
