@@ -31,7 +31,6 @@
             align-items: flex-start;
             min-height: 100vh;
             padding: 20px;
-            overflow-x: hidden;
         }
 
         .app-container {
@@ -42,7 +41,6 @@
             gap: 16px;
         }
 
-        /* Панели */
         .glass-panel {
             background: var(--panel-bg);
             border: 1px solid var(--glass-border);
@@ -113,7 +111,7 @@
         .cat-det h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
         .cat-det p { font-size: 11px; color: var(--text-muted); }
 
-        /* Кнопки и инпуты */
+        /* Элементы управления */
         .btn-action {
             background: var(--accent-color);
             border: none;
@@ -124,10 +122,7 @@
             font-weight: 600;
             cursor: pointer;
             width: 100%;
-            transition: opacity 0.2s;
         }
-
-        .btn-action:active { opacity: 0.8; }
 
         .input-field {
             width: 100%;
@@ -149,10 +144,9 @@
             color: var(--text-color);
             font-size: 14px;
             outline: none;
-            margin-bottom: 10px;
         }
 
-        /* Модалка авторизации */
+        /* Модальное окно */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -206,38 +200,39 @@
 
         <!-- Сетка сфер прокачки -->
         <div class="grid-categories" id="categoriesGrid">
-            <!-- Сферы генерируются динамически через JS -->
+            <!-- Генерируются через JavaScript -->
         </div>
 
         <!-- Панель добавления новых сфер -->
         <div class="glass-panel">
-            <h4 style="font-size: 14px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Создать новую сферу</h4>
-            <input type="text" id="newSphereName" class="input-field" placeholder="Название (например, Спорт, Финансы)" style="margin-bottom: 10px;">
-            <select id="newSphereColor" class="select-field">
-                <option value="#8e44ad">Фиолетовый</option>
-                <option value="#27ae60">Зеленый</option>
-                <option value="#2980b9">Синий</option>
-                <option value="#c0392b">Красный</option>
-                <option value="#e67e22">Оранжевый</option>
-                <option value="#f1c40f">Желтый</option>
-            </select>
-            <button class="btn-action" onclick="addNewSphere()">Добавить сферу</button>
+            <h4 style="font-size: 14px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Добавить сферу</h4>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <input type="text" id="newSphereName" class="input-field" placeholder="Название сферы">
+                <select id="newSphereColor" class="select-field">
+                    <option value="#8e44ad">Фиолетовый</option>
+                    <option value="#27ae60">Зеленый</option>
+                    <option value="#2980b9">Синий</option>
+                    <option value="#c0392b">Красный</option>
+                    <option value="#e67e22">Оранжевый</option>
+                </select>
+                <button class="btn-action" onclick="addNewSphere()">Создать круг</button>
+            </div>
         </div>
 
     </div>
 
-    <!-- МОДАЛКА ОБЯЗАТЕЛЬНОЙ АВТОРИЗАЦИИ -->
+    <!-- МОДАЛКА АВТОРИЗАЦИИ -->
     <div class="modal-overlay" id="loginModal">
         <div class="modal-content">
             <h3>Вход в систему</h3>
-            <p>Введите ваш уникальный логин для кастомизации игрового профиля.</p>
+            <p>Укажите свои данные для персонализации интерфейса.</p>
             <input type="text" id="usernameInput" class="input-field" placeholder="Введите свой логин" style="margin-bottom: 16px;">
-            <button class="btn-action" onclick="saveLogin()">Запустить приложение</button>
+            <button class="btn-action" onclick="saveLogin()">Войти</button>
         </div>
     </div>
 
     <script>
-        // Базовый стейт с дефолтными сферами, как было раньше
+        // Исходный стейт с оригинальными сферами
         let state = {
             user: "z-test-user",
             isAuthorized: false,
@@ -252,12 +247,11 @@
         };
 
         window.onload = function() {
-            const savedData = localStorage.getItem('circle_lf_base_state');
+            const savedData = localStorage.getItem('circle_lf_classic_state');
             if (savedData) {
                 state = JSON.parse(savedData);
             }
 
-            // Жесткая проверка авторизации
             if (!state.isAuthorized || state.user === "z-test-user") {
                 document.getElementById('loginModal').classList.add('active');
             } else {
@@ -266,13 +260,13 @@
         };
 
         function saveState() {
-            localStorage.setItem('circle_lf_base_state', JSON.stringify(state));
+            localStorage.setItem('circle_lf_classic_state', JSON.stringify(state));
         }
 
         function saveLogin() {
             const loginInput = document.getElementById('usernameInput').value.trim();
             if (!loginInput) {
-                alert("Пожалуйста, введите логин!");
+                alert("Поле не может быть пустым!");
                 return;
             }
             state.user = loginInput.startsWith('@') ? loginInput : '@' + loginInput;
@@ -282,21 +276,18 @@
             updateUI();
         }
 
-        // Клик по сфере симулирует начисление опыта (как в старой версии)
         function gainXp(sphereId) {
             const sphere = state.spheres.find(s => s.id === sphereId);
             if (!sphere) return;
 
             sphere.xp += 25;
-            state.xp.core += 10; // Опыт в ядро
+            state.xp.core += 10;
 
-            // Левелап сферы
             if (sphere.xp >= 100) {
                 sphere.level += 1;
                 sphere.xp = 0;
             }
 
-            // Левелап ядра
             if (state.xp.core >= 100) {
                 state.levels.core += 1;
                 state.xp.core = 0;
@@ -306,14 +297,13 @@
             updateUI();
         }
 
-        // Функция динамического добавления новых кругов
         function addNewSphere() {
             const nameInput = document.getElementById('newSphereName');
             const name = nameInput.value.trim();
             const color = document.getElementById('newSphereColor').value;
 
             if (!name) {
-                alert("Введите название сферы!");
+                alert("Укажите имя сферы!");
                 return;
             }
 
@@ -331,7 +321,6 @@
             updateUI();
         }
 
-        // Рендер сфер в сетку
         function renderSpheres() {
             const grid = document.getElementById('categoriesGrid');
             grid.innerHTML = "";
@@ -359,7 +348,6 @@
             });
         }
 
-        // Синхронизация данных с интерфейсом
         function updateUI() {
             document.getElementById('userNameDisplay').innerText = state.user;
             document.getElementById('coreLevel').innerText = state.levels.core;
