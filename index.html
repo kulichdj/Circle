@@ -187,4 +187,629 @@
         .modal-box { background: var(--panel-bg); color: var(--text-main); padding: 30px; border-radius: 24px; text-align: center; max-width: 350px; width: 85%; transform: scale(0.8); transition: transform 0.3s; position: relative; box-shadow: var(--shadow); }
         .modal-overlay.active .modal-box { transform: scale(1); }
         
-        .close-ach-btn { background: var(--text-
+        .close-ach-btn { background: var(--text-main); color: var(--bg-color); border: none; padding: 12px 24px; border-radius: 12px; font-weight: 600; cursor: pointer; width: 100%; margin-top: auto; }
+        .ach-box { max-width: 420px; height: 80vh; display: flex; flex-direction: column; text-align: left; padding: 24px; }
+        .ach-list-scroll { flex-grow: 1; overflow-y: auto; margin: 16px 0; display: flex; flex-direction: column; gap: 12px; }
+        .ach-card { display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: rgba(0,0,0,0.1); border-radius: 18px; position: relative; }
+        .ach-card.unlocked { background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%); }
+        .ach-icon-box { font-size: 1.6rem; filter: grayscale(1); opacity: 0.2; }
+        .ach-card.unlocked .ach-icon-box { filter: grayscale(0); opacity: 1; }
+        .ach-title-text { font-size: 0.9rem; font-weight: 600; opacity: 0.4; }
+        .ach-card.unlocked .ach-title-text { opacity: 1; }
+        .ach-desc-text { font-size: 0.75rem; color: var(--text-muted); }
+
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-weight: 500; }
+        .cal-nav-btn { background: transparent; border: none; color: var(--text-main); font-size: 1.1rem; cursor: pointer; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
+        .cal-day-label { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
+        .cal-cell { aspect-ratio: 1; display: flex; justify-content: center; align-items: center; font-size: 0.85rem; border-radius: 50%; cursor: pointer; position: relative; }
+        .cal-cell.has-tasks::after { content: ''; position: absolute; bottom: 4px; width: 4px; height: 4px; background: rgba(120, 119, 198, 0.8); border-radius: 50%; }
+        .cal-cell.selected { background: var(--cal-active) !important; color: var(--cal-active-text) !important; font-weight: 600; }
+        .cal-cell.empty { pointer-events: none; opacity: 0; }
+
+        .diary-status-tag { display: inline-block; font-size: 0.65rem; background: rgba(34, 197, 94, 0.15); color: #4ade80; padding: 2px 8px; border-radius: 8px; margin-top: 4px; }
+        textarea.diary-area { width: 100%; height: 160px; resize: none; line-height: 1.5; font-size: 0.95rem; }
+
+        /* Фикс оверлея для неудаляемой авторизации */
+        #forced-login-modal { background: rgba(7, 8, 10, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); }
+    </style>
+</head>
+<body>
+
+    <div class="splash-screen" id="splash-layer">
+        <div class="splash-logo-container">
+            <div class="splash-ring"></div>
+            <div style="font-size: 1.6rem; font-weight: 200;">Circle</div>
+        </div>
+        <div class="splash-text">lf</div>
+    </div>
+
+    <svg width="0" height="0" style="position: absolute;">
+        <defs>
+            <linearGradient id="ring-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="var(--ring-gradient-start)" />
+                <stop offset="100%" stop-color="var(--ring-gradient-end)" />
+            </linearGradient>
+        </defs>
+    </svg>
+
+    <div class="theme-switcher">
+        <button class="toggle-style-btn" onclick="toggleTheme()">
+            <span id="theme-btn-icon">☀️</span> <span id="theme-btn-text">Светлая тема</span>
+        </button>
+    </div>
+
+    <div class="app-container">
+        <div class="glass-panel hero-stats">
+            <div class="main-circle-container">
+                <svg class="progress-ring" width="115" height="115">
+                    <circle class="circle-bg" cx="57.5" cy="55" r="52"/>
+                    <circle class="main-circle-progress" id="main-xp-circle" cx="57.5" cy="55" r="52"/>
+                </svg>
+                <div class="main-level-number" id="main-level">0</div>
+            </div>
+            <div class="main-text-stats">
+                <div class="stat-label" id="profile-tag-label">Загрузка...</div>
+                <div class="stat-value" style="font-size: 1.2rem; font-weight: 300;" id="main-sphere-status">Новичок фокуса</div>
+                <div class="stat-label">Прогресс ядра</div>
+                <div id="main-xp-text" style="font-size: 0.8rem; color: var(--text-muted);">0 / 100 XP</div>
+            </div>
+        </div>
+
+        <div class="spheres-grid" id="spheres-container">
+            </div>
+
+        <div class="action-grid">
+            <button class="action-btn" onclick="openCalModal()">📅 Календарь</button>
+            <button class="action-btn" onclick="openDiaryModal()">📖 Дневник мысли</button>
+            <button class="action-btn" onclick="openAchModal()">🏆 Достижения</button>
+        </div>
+
+        <div class="glass-panel">
+            <h2>Новый круг опыта</h2>
+            <div class="input-group">
+                <input type="text" id="new-sphere-input" placeholder="Название сферы (например, Финансы)">
+                <button class="main-btn" onclick="addNewSphere()">Создать сферу</button>
+            </div>
+        </div>
+
+        <div class="glass-panel">
+            <h2 id="form-title">Новая цель</h2>
+            <div class="input-group">
+                <input type="text" id="quest-input" placeholder="What needs to be done?">
+                <select id="quest-sphere">
+                    </select>
+                <select id="quest-difficulty">
+                    <option value="easy">Малый фокус (+20 XP)</option>
+                    <option value="medium" selected>Стандартная цель (+50 XP)</option>
+                    <option value="hard">Тяжелый вызов (+100 XP)</option>
+                </select>
+                <button class="main-btn" onclick="addQuest()">Добавить задачу</button>
+            </div>
+        </div>
+
+        <div class="quests-container">
+            <h3 id="quests-header-text">Активные цели</h3>
+            <div id="quests-list"></div>
+        </div>
+
+        <div class="quests-container" style="margin-top: 24px;">
+            <h3 style="color: var(--text-muted); opacity: 0.7;">Выполнено сегодня (Откат целей)</h3>
+            <div id="completed-quests-list"></div>
+        </div>
+        
+        <div class="credits-footer">by KULISINSKIY</div>
+        
+        <div class="danger-zone-container">
+            <button class="hard-reset-btn" onclick="requestHardReset()">⚠️ Сбросить весь прогресс</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="ach-modal">
+        <div class="modal-box ach-box">
+            <h4>Свиток достижений</h4>
+            <div class="ach-list-scroll" id="ach-list-container"></div>
+            <button class="close-ach-btn" onclick="closeAchModal()">Вернуться к целям</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="diary-modal">
+        <div class="modal-box" style="max-width: 400px; width: 90%; text-align: left;">
+            <h4>Дневник мыслей</h4>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;" id="diary-date-label">Загрузка...</div>
+            <div class="input-group">
+                <textarea class="diary-area" id="diary-textarea" placeholder="Запиши свои инсайты..."></textarea>
+                <button class="main-btn" onclick="saveDiaryEntry()">Сохранить заметку</button>
+                <button class="close-ach-btn" onclick="closeDiaryModal()" style="background: transparent; color: var(--text-main); margin-top: 4px;">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="cal-modal">
+        <div class="modal-box" style="max-width: 400px; width: 90%;">
+            <div class="cal-header">
+                <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
+                <span id="cal-month-title"></span>
+                <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
+            </div>
+            <div class="cal-grid" id="cal-grid-container"></div>
+            <button class="close-ach-btn" onclick="closeCalModal()" style="margin-top: 20px;">Выбрать дату</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="levelup-modal">
+        <div class="modal-box">
+            <h4 id="modal-title">Новый уровень!</h4>
+            <p id="modal-desc">Вы успешно продвинулись вперед.</p>
+            <button onclick="closeModal()">Продолжить</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="forced-login-modal">
+        <div class="modal-box" style="max-width: 360px;">
+            <h4 style="margin-bottom: 8px;">Вход в Circle lf</h4>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.4;">Укажите ваш логин или никнейм для подключения к облачной синхронизации прогресса RPG.</p>
+            <div class="input-group">
+                <input type="text" id="forced-username-input" placeholder="Введите свой логин">
+                <button class="main-btn" onclick="submitForcedLogin()">Войти в систему</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === НАСТРОЙКА КЛЮЧЕЙ SUPABASE ===
+        const SUPABASE_URL = "ВСТАВЬ_СЮДА_PROJECT_URL";
+        const SUPABASE_KEY = "ВСТАВЬ_СЮДА_ANON_PUBLIC_KEY";
+
+        let telegramId = localStorage.getItem('circle_lf_tg_id');
+        
+        let state = createDefaultState();
+        let diaryNotes = {};
+        let quests = [];
+
+        function createDefaultState() {
+            return {
+                mainLevel: 0, mainXp: 0, mainNextLevelXp: 100, totalCompleted: 0, easyCompleted: 0, medCompleted: 0, hardCompleted: 0,
+                spheres: [
+                    { id: 0, name: "Работа", level: 0, xp: 0, nextXp: 100 },
+                    { id: 1, name: "Хобби", level: 0, xp: 0, nextXp: 100 },
+                    { id: 2, name: "Отдых", level: 0, xp: 0, nextXp: 100 },
+                    { id: 3, name: "Спорт", level: 0, xp: 0, nextXp: 100 }
+                ], unlockedAchs: []
+            };
+        }
+
+        function isCloudEnabled() {
+            return (SUPABASE_URL && SUPABASE_KEY && !SUPABASE_URL.includes("ВСТАВЬ_СЮДА") && SUPABASE_URL.trim() !== "");
+        }
+
+        async function initApp() {
+            // Если ID нет, жестко блокируем интерфейс системным оверлеем
+            if (!telegramId || telegramId === "@test_user" || telegramId === "@z-test-user") {
+                document.getElementById('forced-login-modal').classList.add('active');
+                hideSplash();
+                return;
+            }
+            await loadFromCloud();
+        }
+
+        function submitForcedLogin() {
+            const inputEl = document.getElementById('forced-username-input');
+            let input = inputEl.value.trim();
+            if (!input) {
+                alert("Поле логина не может быть пустым!");
+                return;
+            }
+            telegramId = input.startsWith('@') ? input : '@' + input;
+            localStorage.setItem('circle_lf_tg_id', telegramId);
+            document.getElementById('forced-login-modal').classList.remove('active');
+            
+            // Запускаем стандартную цепочку загрузки после авторизации
+            loadFromCloud();
+        }
+
+        async function loadFromCloud() {
+            if (!isCloudEnabled()) {
+                loadLocally(); hideSplash(); updateUI(); return;
+            }
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 4000);
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/user_progress?telegram_id=eq.${telegramId}`, {
+                    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` },
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+                if (!response.ok) throw new Error("Cloud bad response");
+                const data = await response.json();
+                if (data && data.length > 0) {
+                    state = data[0].game_state || createDefaultState();
+                    quests = data[0].quests_state || [];
+                    diaryNotes = data[0].diary_state || {};
+                } else {
+                    loadLocally();
+                }
+            } catch(e) {
+                console.warn("Аварийное переключение на локальный режим:", e.message);
+                loadLocally();
+            }
+            hideSplash(); updateUI();
+        }
+
+        function loadLocally() {
+            try {
+                state = JSON.parse(localStorage.getItem('rpg_glass_v2.0_state')) || createDefaultState();
+                diaryNotes = JSON.parse(localStorage.getItem('circle_lf_diary_v1')) || {};
+                quests = JSON.parse(localStorage.getItem('rpg_glass_v2.0_quests')) || [];
+            } catch(e) { state = createDefaultState(); }
+        }
+
+        async function saveToCloud() {
+            localStorage.setItem('rpg_glass_v2.0_state', JSON.stringify(state));
+            localStorage.setItem('rpg_glass_v2.0_quests', JSON.stringify(quests));
+            localStorage.setItem('circle_lf_diary_v1', JSON.stringify(diaryNotes));
+            if (!isCloudEnabled()) return;
+            try {
+                await fetch(`${SUPABASE_URL}/rest/v1/user_progress`, {
+                    method: "POST",
+                    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" },
+                    body: JSON.stringify({ telegram_id: telegramId, game_state: state, quests_state: quests, diary_state: diaryNotes, updated_at: new Date().toISOString() })
+                });
+            } catch(e) { console.error("Ошибка сохранения:", e); }
+        }
+
+        async function requestHardReset() {
+            let check = prompt("🚨 ВНИМАНИЕ: Это действие безвозвратно сотрет все ваши уровни, квесты и дневники на всех устройствах!\n\nДля подтверждения введите слово УДАЛИТЬ большими буквами:");
+            if (check === "УДАЛИТЬ") {
+                localStorage.removeItem('rpg_glass_v2.0_state');
+                localStorage.removeItem('rpg_glass_v2.0_quests');
+                localStorage.removeItem('circle_lf_diary_v1');
+                localStorage.removeItem('circle_lf_tg_id');
+
+                if (isCloudEnabled()) {
+                    try {
+                        await fetch(`${SUPABASE_URL}/rest/v1/user_progress?telegram_id=eq.${telegramId}`, {
+                            method: "DELETE",
+                            headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+                        });
+                    } catch(e) { console.error("Ошибка удаления строки из облака:", e); }
+                }
+
+                alert("Все данные успешно стерты. Приложение перезапускается.");
+                location.reload();
+            } else {
+                alert("Сброс отменен. Кодовое слово введено неверно.");
+            }
+        }
+
+        function hideSplash() { setTimeout(() => { const splash = document.getElementById('splash-layer'); if (splash) splash.classList.add('hidden'); }, 600); }
+        function escapeHtml(text) { if (!text) return ''; return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;").replace(/\n/g, " "); }
+
+        const achDatabase = [
+            { id: 0, icon: "🌱", title: "Первый триумф", desc: "Успешно закройте вашу самую первую цель" },
+            { id: 1, icon: "⚡", title: "Разгон набран", desc: "Выполните суммарно 5 любых задач" },
+            { id: 2, icon: "🔥", title: "Машина фокуса", desc: "Выполните суммарно 25 задач" },
+            { id: 3, icon: "💎", title: "Эрудит", desc: "Выполните 10 стандартных целей" },
+            { id: 4, icon: "⚔️", title: "Сокрушитель преград", desc: "Одолейте 3 тяжелых вызова (+100 XP)" },
+            { id: 5, icon: "🛡️", title: "Герой титана", desc: "Одолейте 10 тяжелых вызовов" },
+            { id: 6, icon: "🌟", title: "Новая ступень", desc: "Прокачайте любую сферу до 3 уровня" },
+            { id: 7, icon: "🌌", title: "Мастер грани", desc: "Прокачайте любую сферу до 5 уровня" },
+            { id: 8, icon: "🤝", title: "Баланс стихий", desc: "Поднимите абсолютно все сферы до 2 уровня" },
+            { id: 9, icon: "👑", title: "Укрепление ядра", desc: "Прокачайте общий ранг аккаунта до 5 уровня" },
+            { id: 10, icon: "🔮", title: "Высший разум", desc: "Прокачайте общий ранг аккаунта до 10 уровня" },
+            { id: 11, icon: "🎨", title: "Свой путь", desc: "Переименовайте любую стандартную сферу прокачки" }
+        ];
+
+        let currentTheme = localStorage.getItem('rpg_graphite_theme_mode_v4') || 'dark';
+        if (currentTheme === 'light') { document.body.classList.add('light-theme'); }
+
+        let today = new Date();
+        let currentCalYear = today.getFullYear();
+        let currentCalMonth = today.getMonth();
+        let selectedDateStr = today.toISOString().split('T')[0];
+
+        function toggleTheme() {
+            if (document.body.classList.contains('light-theme')) { document.body.classList.remove('light-theme'); localStorage.setItem('rpg_graphite_theme_mode_v4', 'dark'); }
+            else { document.body.classList.add('light-theme'); localStorage.setItem('rpg_graphite_theme_mode_v4', 'light'); }
+            updateUI();
+        }
+
+        function saveSphereNames() {
+            let changed = false;
+            state.spheres.forEach((sphere, i) => {
+                let inputEl = document.getElementById(`sphere-name-${sphere.id}`);
+                if (inputEl) {
+                    let newName = inputEl.value.trim();
+                    if (sphere.name !== newName && newName !== "") {
+                        sphere.name = newName;
+                        changed = true;
+                    }
+                }
+            });
+            if(changed) triggerAchievement(11); saveToCloud(); updateDropdowns();
+        }
+
+        function updateDropdowns() {
+            const select = document.getElementById('quest-sphere');
+            if (!select) return;
+            const currentVal = select.value;
+            select.innerHTML = '';
+            state.spheres.forEach(sphere => {
+                select.innerHTML += `<option value="${sphere.id}">${sphere.name}</option>`;
+            });
+            if (currentVal !== "") select.value = currentVal;
+        }
+
+        function setCircleProgress(elementId, radius, percent) { const circle = document.getElementById(elementId); if (!circle) return; const circumference = 2 * Math.PI * radius; circle.style.strokeDasharray = circumference + ' ' + circumference; circle.style.strokeDashoffset = circumference - (percent / 100 * circumference); }
+        
+        function renderCalendar() {
+            const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+            document.getElementById('cal-month-title').innerText = monthNames[currentCalMonth] + " " + currentCalYear;
+            const container = document.getElementById('cal-grid-container'); container.innerHTML = '';
+            const labels = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]; labels.forEach(l => container.innerHTML += `<div class="cal-day-label">${l}</div>`);
+            let firstDay = new Date(currentCalYear, currentCalMonth, 1).getDay();
+            let daysInMonth = new Date(currentCalYear, currentCalMonth + 1, 0).getDate();
+            let startOffset = firstDay === 0 ? 6 : firstDay - 1;
+            for (let i = 0; i < startOffset; i++) container.innerHTML += `<div class="cal-cell empty"></div>`;
+            for (let day = 1; daysInMonth >= day; day++) {
+                let monthStr = String(currentCalMonth + 1).padStart(2, '0'); let dayStr = String(day).padStart(2, '0'); let cellDateStr = currentCalYear + "-" + monthStr + "-" + dayStr;
+                let hasTasks = quests.some(q => q.date === cellDateStr) || !!diaryNotes[cellDateStr];
+                let isSelected = selectedDateStr === cellDateStr;
+                container.innerHTML += `<div class="cal-cell ${isSelected ? 'selected' : ''} ${hasTasks ? 'has-tasks' : ''}" onclick="selectDate('${cellDateStr}')">${day}</div>`;
+            }
+        }
+        function changeMonth(direction) { currentCalMonth += direction; if (currentCalMonth > 11) { currentCalMonth = 0; currentCalYear++; } if (currentCalMonth < 0) { currentCalMonth = 11; currentCalYear--; } renderCalendar(); }
+        function selectDate(dateStr) { selectedDateStr = dateStr; renderCalendar(); updateUI(); }
+        function openDiaryModal() { let d = new Date(selectedDateStr); document.getElementById('diary-date-label').innerText = "Мысли за " + d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }); document.getElementById('diary-textarea').value = diaryNotes[selectedDateStr] || ""; document.getElementById('diary-modal').classList.add('active'); }
+        function closeDiaryModal() { document.getElementById('diary-modal').classList.remove('active'); }
+        function saveDiaryEntry() { const text = document.getElementById('diary-textarea').value.trim(); if (text) diaryNotes[selectedDateStr] = text; else delete diaryNotes[selectedDateStr]; saveToCloud(); closeDiaryModal(); updateUI(); }
+
+        function triggerAchievement(id) { if (state.unlockedAchs && !state.unlockedAchs.includes(id)) { state.unlockedAchs.push(id); saveToCloud(); setTimeout(() => { showModal("🏆 ДОСТИЖЕНИЕ ОТКРЫТО!", `Вы разблокировали: "${achDatabase[id].title}"`); }, 600); } }
+        function evaluateAchievements() {
+            if (!state.unlockedAchs) state.unlockedAchs = [];
+            if (state.totalCompleted >= 1) triggerAchievement(0);
+            if (state.totalCompleted >= 5) triggerAchievement(1);
+            if (state.totalCompleted >= 25) triggerAchievement(2);
+            if (state.medCompleted >= 10) triggerAchievement(3);
+            if (state.hardCompleted >= 3) triggerAchievement(4);
+            if (state.hardCompleted >= 10) triggerAchievement(5);
+            let lvls = state.spheres.map(s => s.level);
+            if (Math.max(...lvls) >= 3) triggerAchievement(6);
+            if (Math.max(...lvls) >= 5) triggerAchievement(7);
+            if (lvls.length >= 4 && Math.min(...lvls) >= 2) triggerAchievement(8);
+            if (state.mainLevel >= 5) triggerAchievement(9);
+            if (state.mainLevel >= 10) triggerAchievement(10);
+        }
+
+        function buildAchievementsUI() {
+            const container = document.getElementById('ach-list-container'); if(!container) return; container.innerHTML = '';
+            achDatabase.forEach(ach => {
+                const isUnlocked = state.unlockedAchs && state.unlockedAchs.includes(ach.id);
+                container.innerHTML += `<div class="ach-card ${isUnlocked ? 'unlocked' : ''}"><div class="ach-icon-box">${ach.icon}</div><div><div class="ach-title-text">${ach.title}</div><div class="ach-desc-text">${ach.desc}</div></div></div>`;
+            });
+        }
+
+        // Динамический рендер сфер в грид-сетку
+        function renderSpheresUI() {
+            const container = document.getElementById('spheres-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            state.spheres.forEach(sphere => {
+                container.innerHTML += `
+                    <div class="sphere-card">
+                        <div class="sphere-circle-container">
+                            <svg class="progress-ring" width="70" height="70">
+                                <circle class="circle-bg" cx="35" cy="35" r="32"/>
+                                <circle class="sphere-circle-progress" id="sphere-circle-${sphere.id}" cx="35" cy="35" r="32"/>
+                            </svg>
+                            <div class="sphere-level" id="sphere-lvl-${sphere.id}">${sphere.level}</div>
+                        </div>
+                        <input type="text" class="sphere-name-input" id="sphere-name-${sphere.id}" onchange="saveSphereNames()" value="${sphere.name}">
+                        <div class="sphere-xp-text" id="sphere-xp-${sphere.id}">${sphere.xp}/${sphere.nextXp} XP</div>
+                    </div>
+                `;
+            });
+        }
+
+        // Логика динамического добавления новой сферы
+        function addNewSphere() {
+            const input = document.getElementById('new-sphere-input');
+            const name = input.value.trim();
+            if (!name) return;
+
+            // Генерируем уникальный ID на базе таймстампа
+            const newId = Date.now();
+            state.spheres.push({
+                id: newId,
+                name: name,
+                level: 0,
+                xp: 0,
+                nextXp: 100
+            });
+
+            input.value = '';
+            saveToCloud();
+            updateUI();
+        }
+
+        function updateUI() {
+            if (!state || !state.spheres) state = createDefaultState();
+
+            document.getElementById('profile-tag-label').innerText = "Профиль: " + (telegramId || "@user");
+
+            document.getElementById('main-level').innerText = state.mainLevel;
+            document.getElementById('main-xp-text').innerText = state.mainXp + " / " + state.mainNextLevelXp + " XP";
+            setCircleProgress('main-xp-circle', 52, (state.mainXp / state.mainNextLevelXp) * 100);
+
+            let status = "Новичок";
+            if(state.mainLevel >= 5) status = "Специалист";
+            if(state.mainLevel >= 10) status = "Мастер линейки";
+            document.getElementById('main-sphere-status').innerText = status;
+
+            // Перерисовываем элементы интерфейса сфер
+            renderSpheresUI();
+            
+            // Настраиваем прогресс-бары для каждой сферы
+            state.spheres.forEach(sphere => {
+                setCircleProgress(`sphere-circle-${sphere.id}`, 32, (sphere.xp / sphere.nextXp) * 100);
+            });
+
+            updateDropdowns(); evaluateAchievements();
+
+            let d = new Date(selectedDateStr);
+            document.getElementById('quests-header-text').innerText = "Цели на " + d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+
+            const list = document.getElementById('quests-list');
+            const compList = document.getElementById('completed-quests-list');
+            list.innerHTML = ''; compList.innerHTML = '';
+            
+            if (diaryNotes[selectedDateStr]) {
+                list.innerHTML += `
+                    <div class="quest-item" style="border-left: 3px solid #4ade80; cursor: pointer;" onclick="openDiaryModal()">
+                        <div style="width: 100%;">
+                            <div class="quest-title" style="font-size: 0.9rem; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 320px;">"${escapeHtml(diaryNotes[selectedDateStr])}"</div>
+                            <div class="diary-status-tag">📖 Дневник закроется</div>
+                        </div>
+                    </div>`;
+            }
+
+            let filteredActive = quests.filter(q => q.date === selectedDateStr && !q.completed);
+            let filteredDone = quests.filter(q => q.date === selectedDateStr && q.completed);
+
+            if(filteredActive.length === 0 && !diaryNotes[selectedDateStr]) {
+                list.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 24px; font-size: 0.9rem; font-style: italic;">На этот день активных задач нет.</div>';
+            }
+            if(filteredDone.length === 0) {
+                compList.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 16px; font-size: 0.85rem; font-style: italic;">Выполненных задач пока нет.</div>';
+            }
+
+            quests.forEach((quest, index) => {
+                if (quest.date !== selectedDateStr) return;
+                let rewards = quest.difficulty === 'easy' ? "+20 XP" : quest.difficulty === 'hard' ? "+100 XP" : "+50 XP";
+                const linkedSphere = state.spheres.find(s => s.id === quest.sphereId);
+                const sphereName = linkedSphere ? linkedSphere.name : "Сфера";
+                
+                if(!quest.completed) {
+                    list.innerHTML += `
+                        <div class="quest-item" id="quest-${index}">
+                            <div>
+                                <div class="quest-title">${quest.text}</div>
+                                <div>
+                                    <span class="quest-tag">${sphereName}</span>
+                                    <span style="font-size:0.75rem; color: var(--text-muted); margin-left: 6px;">${rewards}</span>
+                                </div>
+                            </div>
+                            <div class="action-wrapper">
+                                <button class="check-btn" onclick="toggleConfirm(${index}, event)">✓</button>
+                                <div class="confirm-popup" id="popup-${index}">
+                                    <button class="confirm-btn no" onclick="toggleConfirm(${index}, event)">Нет</button>
+                                    <button class="confirm-btn yes" onclick="completeQuest(${index})">Да</button>
+                                </div>
+                            </div>
+                        </div>`;
+                } else {
+                    compList.innerHTML += `
+                        <div class="quest-item" id="quest-${index}" style="opacity: 0.65; border-left: 2px dashed var(--text-muted);">
+                            <div>
+                                <div class="quest-title" style="text-decoration: line-through; color: var(--text-muted);">${quest.text}</div>
+                                <div>
+                                    <span class="quest-tag">${sphereName}</span>
+                                    <span style="font-size:0.75rem; color: var(--text-muted); margin-left: 6px;">${rewards}</span>
+                                </div>
+                            </div>
+                            <div>
+                                <button class="check-btn" onclick="undoQuest(${index})" style="font-size: 0.9rem;">↩️</button>
+                            </div>
+                        </div>`;
+                }
+            });
+        }
+
+        function addQuest() {
+            const input = document.getElementById('quest-input');
+            const sphereId = parseInt(document.getElementById('quest-sphere').value);
+            const difficulty = document.getElementById('quest-difficulty').value;
+            if (!input || !input.value.trim()) return;
+
+            quests.push({ text: input.value, sphereId: sphereId, difficulty: difficulty, date: selectedDateStr, completed: false });
+            input.value = ''; saveToCloud(); updateUI();
+        }
+
+        function toggleConfirm(index, event) {
+            event.stopPropagation();
+            document.querySelectorAll('.confirm-popup').forEach((p, idx) => { if(idx !== index) p.classList.remove('active'); });
+            document.getElementById(`popup-${index}`).classList.toggle('active');
+        }
+
+        document.addEventListener('click', () => document.querySelectorAll('.confirm-popup').forEach(p => p.classList.remove('active')));
+
+        function completeQuest(index) {
+            document.getElementById(`quest-${index}`).classList.add('fade-out');
+            setTimeout(() => {
+                const quest = quests[index];
+                let xpReward = quest.difficulty === 'easy' ? 20 : quest.difficulty === 'hard' ? 100 : 50;
+                
+                if(quest.difficulty === 'easy') state.easyCompleted++;
+                if(quest.difficulty === 'medium') state.medCompleted++;
+                if(quest.difficulty === 'hard') state.hardCompleted++;
+                state.totalCompleted++;
+
+                let ts = state.spheres.find(s => s.id === quest.sphereId);
+                let leveledUpSphere = false;
+                
+                if (ts) {
+                    ts.xp += xpReward;
+                    if (ts.xp >= ts.nextXp) { ts.xp -= ts.nextXp; ts.level++; ts.nextXp = Math.floor(ts.nextXp * 1.25); leveledUpSphere = true; }
+                }
+
+                let mainReward = Math.floor(xpReward * 0.7);
+                state.mainXp += mainReward;
+                let leveledUpMain = false;
+                if (state.mainXp >= state.mainNextLevelXp) { state.mainXp -= state.mainNextLevelXp; state.mainLevel++; state.mainNextLevelXp = Math.floor(state.mainNextLevelXp * 1.35); leveledUpMain = true; }
+
+                if (leveledUpMain) { showModal("ГЛОБАЛЬНЫЙ ЛЕВЕЛАП!", "Общий ранг вырос до " + state.mainLevel + " уровня."); }
+                else if (leveledUpSphere && ts) { showModal("Сфера прокачана!", `"${ts.name}" развилась до ${ts.level} уровня!`); }
+
+                quest.completed = true;
+                saveToCloud(); updateUI();
+            }, 400);
+        }
+
+        function undoQuest(index) {
+            const quest = quests[index];
+            if(!quest) return;
+            let xpReward = quest.difficulty === 'easy' ? 20 : quest.difficulty === 'hard' ? 100 : 50;
+
+            if(quest.difficulty === 'easy' && state.easyCompleted > 0) state.easyCompleted--;
+            if(quest.difficulty === 'medium' && state.medCompleted > 0) state.medCompleted--;
+            if(quest.difficulty === 'hard' && state.hardCompleted > 0) state.hardCompleted--;
+            if(state.totalCompleted > 0) state.totalCompleted--;
+
+            let ts = state.spheres.find(s => s.id === quest.sphereId);
+            if (ts) {
+                ts.xp -= xpReward;
+                if (ts.xp < 0 && ts.level > 0) { ts.level--; ts.nextXp = Math.ceil(ts.nextXp / 1.25); ts.xp = ts.nextXp + ts.xp; } 
+                else if (ts.xp < 0) { ts.xp = 0; }
+            }
+
+            let mainReward = Math.floor(xpReward * 0.7);
+            state.mainXp -= mainReward;
+            if (state.mainXp < 0 && state.mainLevel > 0) { state.mainLevel--; state.mainNextLevelXp = Math.ceil(state.mainNextLevelXp / 1.35); state.mainXp = state.mainNextLevelXp + state.mainXp; } 
+            else if (state.mainXp < 0) { state.mainXp = 0; }
+
+            quest.completed = false;
+            saveToCloud(); updateUI();
+        }
+
+        function showModal(title, desc) { document.getElementById('modal-title').innerText = title; document.getElementById('modal-desc').innerText = desc; document.getElementById('levelup-modal').classList.add('active'); }
+        function closeModal() { document.getElementById('levelup-modal').classList.remove('active'); }
+        function openAchModal() { buildAchievementsUI(); document.getElementById('ach-modal').classList.add('active'); }
+        function closeAchModal() { document.getElementById('ach-modal').classList.remove('active'); }
+        function openCalModal() { renderCalendar(); document.getElementById('cal-modal').classList.add('active'); }
+        function closeCalModal() { document.getElementById('cal-modal').classList.remove('active'); }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
