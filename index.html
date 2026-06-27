@@ -15,17 +15,26 @@
             --glass-blur: blur(20px);
         }
 
+        .light-theme {
+            --bg-color: #f2f2f7;
+            --panel-bg: rgba(255, 255, 255, 0.70);
+            --text-color: #000000;
+            --text-muted: #6c6c72;
+            --glass-border: rgba(0, 0, 0, 0.06);
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
+            transition: background-color 0.4s, color 0.4s;
             display: flex;
             justify-content: center;
             align-items: flex-start;
@@ -41,28 +50,50 @@
             gap: 16px;
         }
 
+        /* Хедер управления темами */
+        .header-controls {
+            display: flex;
+            justify-content: flex-end;
+            padding: 4px;
+        }
+
+        .btn-theme {
+            background: var(--panel-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: var(--glass-blur);
+            color: var(--text-color);
+            padding: 10px 16px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        /* Премиум стеклянные панели (Glassmorphic) */
         .glass-panel {
             background: var(--panel-bg);
             border: 1px solid var(--glass-border);
             backdrop-filter: var(--glass-blur);
             border-radius: 24px;
-            padding: 18px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 14px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
         }
 
         /* Профиль */
         .profile-section {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 18px;
         }
 
         .circle-progress-wrapper {
             position: relative;
-            width: 70px;
-            height: 70px;
+            width: 72px;
+            height: 72px;
         }
 
         .circle-svg {
@@ -71,21 +102,22 @@
             height: 100%;
         }
 
-        .circle-bg { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 6; }
-        .circle-fill { fill: none; stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 0.5s; }
+        .circle-bg { fill: none; stroke: rgba(142, 142, 147, 0.12); stroke-width: 5.5; }
+        .circle-fill { fill: none; stroke-width: 5.5; stroke-linecap: round; transition: stroke-dashoffset 0.6s ease-in-out; }
 
         .circle-inner-text {
             position: absolute;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 18px;
-            font-weight: bold;
+            font-size: 19px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
-        .profile-info h2 { font-size: 20px; font-weight: 700; margin-bottom: 2px; }
-        .profile-info p { font-size: 13px; color: var(--text-muted); }
+        .profile-info h2 { font-size: 21px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 2px; }
+        .profile-info p { font-size: 13px; color: var(--text-muted); font-weight: 400; }
 
-        /* Сетки категорий */
+        /* Эстетичная сетка категорий */
         .grid-categories {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -96,98 +128,118 @@
             background: var(--panel-bg);
             border: 1px solid var(--glass-border);
             backdrop-filter: var(--glass-blur);
-            border-radius: 20px;
-            padding: 14px;
+            border-radius: 22px;
+            padding: 16px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
             cursor: pointer;
+            box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease;
         }
 
-        .category-card .circle-progress-wrapper { width: 44px; height: 44px; }
-        .category-card .circle-inner-text { font-size: 13px; }
-        .category-card .circle-bg, .category-card .circle-fill { stroke-width: 5; }
+        .category-card:active { transform: scale(0.97); }
+        .category-card .circle-progress-wrapper { width: 46px; height: 46px; }
+        .category-card .circle-inner-text { font-size: 14px; font-weight: 600; }
+        .category-card .circle-bg, .category-card .circle-fill { stroke-width: 4.5; }
 
-        .cat-det h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
-        .cat-det p { font-size: 11px; color: var(--text-muted); }
+        .cat-det h4 { font-size: 15px; font-weight: 600; letter-spacing: -0.2px; margin-bottom: 2px; }
+        .cat-det p { font-size: 11px; color: var(--text-muted); font-weight: 500; }
 
-        /* Элементы управления */
-        .btn-action {
-            background: var(--accent-color);
-            border: none;
-            color: #fff;
-            padding: 12px;
-            border-radius: 14px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-        }
-
+        /* Формы и кнопки */
         .input-field {
             width: 100%;
-            padding: 12px;
-            border-radius: 12px;
+            padding: 12px 14px;
+            border-radius: 14px;
             border: 1px solid var(--glass-border);
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.25);
             color: var(--text-color);
             font-size: 16px;
             outline: none;
+            transition: border-color 0.2s;
         }
+        .light-theme .input-field { background: rgba(255, 255, 255, 0.5); }
+        .input-field:focus { border-color: var(--accent-color); }
 
         .select-field {
             width: 100%;
-            padding: 12px;
-            border-radius: 12px;
+            padding: 12px 14px;
+            border-radius: 14px;
             border: 1px solid var(--glass-border);
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.25);
             color: var(--text-color);
             font-size: 14px;
             outline: none;
         }
+        .light-theme .select-field { background: rgba(255, 255, 255, 0.5); }
 
-        /* Модальное окно */
+        .btn-action {
+            background: var(--accent-color);
+            border: none;
+            color: #ffffff;
+            padding: 14px;
+            border-radius: 16px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(175, 82, 222, 0.3);
+            transition: opacity 0.2s;
+        }
+        .btn-action:active { opacity: 0.85; }
+
+        /* Окно авторизации iOS Блокировка */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(15px);
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(25px);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
             opacity: 0; pointer-events: none;
-            transition: opacity 0.3s;
+            transition: opacity 0.4s ease;
         }
 
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
 
         .modal-content {
-            background: var(--panel-bg);
-            border: 1px solid var(--glass-border);
-            backdrop-filter: var(--glass-blur);
-            padding: 24px;
-            border-radius: 24px;
+            background: rgba(30, 30, 35, 0.7);
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(30px);
+            padding: 28px;
+            border-radius: 28px;
             width: 90%;
             max-width: 360px;
             text-align: center;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+        }
+        .light-theme .modal-content {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0,0,0,0.05);
         }
 
-        .modal-content h3 { margin-bottom: 12px; font-size: 20px; }
-        .modal-content p { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+        .modal-content h3 { margin-bottom: 8px; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+        .modal-content p { font-size: 14px; color: var(--text-muted); margin-bottom: 22px; line-height: 1.4; }
     </style>
 </head>
 <body>
 
     <div class="app-container">
         
-        <!-- Профиль -->
+        <!-- Верхняя кнопка переключения темы -->
+        <div class="header-controls">
+            <button class="btn-theme" id="themeToggle" onclick="toggleTheme()">🌙 Темная</button>
+        </div>
+
+        <!-- Профиль главного Ядра -->
         <div class="glass-panel">
             <div class="profile-section">
                 <div class="circle-progress-wrapper">
                     <svg class="circle-svg">
-                        <circle class="circle-bg" cx="35" cy="35" r="31"></circle>
-                        <circle class="circle-fill" id="coreCircle" cx="35" cy="35" r="31" stroke="#af52de" stroke-dasharray="194.7" stroke-dashoffset="194.7"></circle>
+                        <circle class="circle-bg" cx="36" cy="36" r="32"></circle>
+                        <circle class="circle-fill" id="coreCircle" cx="36" cy="36" r="32" stroke="#af52de" stroke-dasharray="201" stroke-dashoffset="201"></circle>
                     </svg>
                     <div class="circle-inner-text" id="coreLevel">1</div>
                 </div>
@@ -198,44 +250,46 @@
             </div>
         </div>
 
-        <!-- Сетка сфер прокачки -->
+        <!-- Основная сетка сфер прокачки -->
         <div class="grid-categories" id="categoriesGrid">
-            <!-- Генерируются через JavaScript -->
+            <!-- Кольца опыта генерятся из JS -->
         </div>
 
-        <!-- Панель добавления новых сфер -->
+        <!-- Панель динамического добавления сфер -->
         <div class="glass-panel">
-            <h4 style="font-size: 14px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Добавить сферу</h4>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <input type="text" id="newSphereName" class="input-field" placeholder="Название сферы">
+            <h4 style="font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Добавить новую сферу</h4>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <input type="text" id="newSphereName" class="input-field" placeholder="Название (например, Финансы)">
                 <select id="newSphereColor" class="select-field">
                     <option value="#8e44ad">Фиолетовый</option>
                     <option value="#27ae60">Зеленый</option>
                     <option value="#2980b9">Синий</option>
                     <option value="#c0392b">Красный</option>
                     <option value="#e67e22">Оранжевый</option>
+                    <option value="#00d2d3">Бирюзовый</option>
                 </select>
-                <button class="btn-action" onclick="addNewSphere()">Создать круг</button>
+                <button class="btn-action" onclick="addNewSphere()">Создать сферу</button>
             </div>
         </div>
 
     </div>
 
-    <!-- МОДАЛКА АВТОРИЗАЦИИ -->
+    <!-- МОДАЛКА СТРОГОГО ВХОДА (ПРОПУСТИТЬ ТАПОМ НЕЛЬЗЯ) -->
     <div class="modal-overlay" id="loginModal">
         <div class="modal-content">
-            <h3>Вход в систему</h3>
-            <p>Укажите свои данные для персонализации интерфейса.</p>
-            <input type="text" id="usernameInput" class="input-field" placeholder="Введите свой логин" style="margin-bottom: 16px;">
-            <button class="btn-action" onclick="saveLogin()">Войти</button>
+            <h3>Вход в Circle LF</h3>
+            <p>Добро пожаловать. Пожалуйста, укажите свой логин, чтобы разблокировать систему RPG-прокачки.</p>
+            <input type="text" id="usernameInput" class="input-field" placeholder="Введите свой логин" style="margin-bottom: 18px;">
+            <button class="btn-action" onclick="saveLogin()">Авторизоваться</button>
         </div>
     </div>
 
     <script>
-        // Исходный стейт с оригинальными сферами
+        // Чистый стейт со стандартной базой кругов
         let state = {
             user: "z-test-user",
             isAuthorized: false,
+            theme: "dark",
             levels: { core: 1 },
             xp: { core: 0 },
             spheres: [
@@ -247,11 +301,18 @@
         };
 
         window.onload = function() {
-            const savedData = localStorage.getItem('circle_lf_classic_state');
-            if (savedData) {
-                state = JSON.parse(savedData);
+            const cached = localStorage.getItem('circle_lf_glass_state');
+            if (cached) {
+                state = JSON.parse(cached);
             }
 
+            // Инициализация темы
+            if (state.theme === "light") {
+                document.body.classList.add('light-theme');
+                document.getElementById('themeToggle').innerText = "☀️ Светлая";
+            }
+
+            // Проверка авторизации
             if (!state.isAuthorized || state.user === "z-test-user") {
                 document.getElementById('loginModal').classList.add('active');
             } else {
@@ -260,22 +321,40 @@
         };
 
         function saveState() {
-            localStorage.setItem('circle_lf_classic_state', JSON.stringify(state));
+            localStorage.setItem('circle_lf_glass_state', JSON.stringify(state));
         }
 
+        // Авторизация
         function saveLogin() {
-            const loginInput = document.getElementById('usernameInput').value.trim();
-            if (!loginInput) {
-                alert("Поле не может быть пустым!");
+            const val = document.getElementById('usernameInput').value.trim();
+            if (!val) {
+                alert("Логин не может быть пустым!");
                 return;
             }
-            state.user = loginInput.startsWith('@') ? loginInput : '@' + loginInput;
+            state.user = val.startsWith('@') ? val : '@' + val;
             state.isAuthorized = true;
             saveState();
             document.getElementById('loginModal').classList.remove('active');
             updateUI();
         }
 
+        // Переключение темы интерфейса
+        function toggleTheme() {
+            const body = document.body;
+            const btn = document.getElementById('themeToggle');
+            if (body.classList.contains('light-theme')) {
+                body.classList.remove('light-theme');
+                btn.innerText = "🌙 Темная";
+                state.theme = "dark";
+            } else {
+                body.classList.add('light-theme');
+                btn.innerText = "☀️ Светлая";
+                state.theme = "light";
+            }
+            saveState();
+        }
+
+        // Клик по кольцу — начисление прогресса
         function gainXp(sphereId) {
             const sphere = state.spheres.find(s => s.id === sphereId);
             if (!sphere) return;
@@ -297,19 +376,19 @@
             updateUI();
         }
 
+        // Функция динамического добавления сфер
         function addNewSphere() {
             const nameInput = document.getElementById('newSphereName');
             const name = nameInput.value.trim();
             const color = document.getElementById('newSphereColor').value;
 
             if (!name) {
-                alert("Укажите имя сферы!");
+                alert("Укажите имя новой сферы!");
                 return;
             }
 
-            const id = 'sphere_' + Date.now();
             state.spheres.push({
-                id: id,
+                id: 'sphere_' + Date.now(),
                 name: name,
                 color: color,
                 level: 0,
@@ -321,6 +400,7 @@
             updateUI();
         }
 
+        // Генерация кругов опыта в сетке
         function renderSpheres() {
             const grid = document.getElementById('categoriesGrid');
             grid.innerHTML = "";
@@ -348,12 +428,13 @@
             });
         }
 
+        // Обновление интерфейса
         function updateUI() {
             document.getElementById('userNameDisplay').innerText = state.user;
             document.getElementById('coreLevel').innerText = state.levels.core;
             document.getElementById('coreXpText').innerText = `Уровень ядра: ${state.xp.core} / 100 XP`;
 
-            const coreOffset = 194.7 - (194.7 * state.xp.core / 100);
+            const coreOffset = 201 - (201 * state.xp.core / 100);
             document.getElementById('coreCircle').style.strokeDashoffset = coreOffset;
 
             renderSpheres();
